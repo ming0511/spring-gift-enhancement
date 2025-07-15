@@ -32,7 +32,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
-// TOOO: 전체 TEST할 때만, 실패
+// TODO: 전체 TEST할 때만, 실패
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(Lifecycle.PER_CLASS)
 class WishControllerTest {

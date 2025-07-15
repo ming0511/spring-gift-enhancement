@@ -8,22 +8,17 @@ import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
-import gift.delete.repository.ProductRepositoryInterface;
+import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepositoryInterface productRepository;
-
     private final ProductRepository products;
 
-    public ProductServiceImpl(ProductRepositoryInterface productRepository,
-        ProductRepository products) {
-        this.productRepository = productRepository;
+    public ProductServiceImpl(ProductRepository products) {
         this.products = products;
     }
 
@@ -66,24 +61,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductGetResponseDto findProductById(Long productId) {
-        Optional<Product> product = products.findById(productId);
+        Product product = products.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
-        if (!product.isPresent()) {
-            throw new ProductNotFoundException("상품이 존재하지 않습니다. productId =" + productId);
-        }
-
-        return new ProductGetResponseDto(product.get().getProductId(), product.get().getName(),
-            product.get().getPrice(), product.get().getImageUrl(), product.get().getMdConfirmed());
+        return new ProductGetResponseDto(product.getProductId(), product.getName(),
+            product.getPrice(), product.getImageUrl(), product.getMdConfirmed());
     }
 
     @Override
     public void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto) {
-        Optional<Product> foundProduct = products.findById(productId);
-
-        if (!foundProduct.isPresent()) {
-            throw new ProductNotFoundException("상품이 존재하지 않습니다. productId =" + productId);
-        }
-
         Boolean mdConfirmed =
             productUpdateRequestDto.name().contains("카카오") ? productUpdateRequestDto.mdConfirmed()
                 : false;
@@ -97,18 +83,25 @@ public class ProductServiceImpl implements ProductService {
             productUpdateRequestDto.price(), productUpdateRequestDto.imageUrl(),
             mdConfirmed);
 
-        // TODO: JPA로 수정.
-        productRepository.updateProduct(product);
+        update(productId, product);
     }
 
     @Override
     public void deleteProduct(Long productId) {
-        Optional<Product> foundProduct = products.findById(productId);
-
-        if (!foundProduct.isPresent()) {
-            throw new ProductNotFoundException("상품이 존재하지 않습니다. productId =" + productId);
-        }
+        products.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         products.deleteById(productId);
+    }
+
+    @Transactional
+    public void update(Long id, Product product) {
+        Product foundProduct = products.findById(id)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
+
+        foundProduct.setName(product.getName());
+        foundProduct.setPrice(product.getPrice());
+        foundProduct.setImageUrl(product.getImageUrl());
+        foundProduct.setMdConfirmed(product.getMdConfirmed());
     }
 }

@@ -87,7 +87,7 @@ class ProductControllerTest {
 
         members.save(
             MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
-                .withName("user").withRole("ROLE_ROLE").build());
+                .withName("user").withRole("ROLE_USER").build());
 
         members.save(
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
@@ -269,96 +269,109 @@ class ProductControllerTest {
             );
     }
 
-//    // PUT
-//    @ParameterizedTest
-//    @MethodSource("tokenProvider")
-//    void 단건상품수정_NO_CONTENT_테스트(String token) {
-//        // given
-//        var request = ProductBuilder.aProduct().build();
-//
-//        // when
-//        var response = exchange(HttpMethod.PUT, baseUrl() + "/1", token, request,
-//            new ParameterizedTypeReference<Void>() {
-//            });
-//
-//        // then
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-//
-//        Product result = queryProductById(1);
-//        assertThatProductEquals(request, result);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {
-//        "",
-//        " ",
-//        "123451234512345",            // 숫자 15자
-//        "Abcdefghijklmno",            // 영어 15자
-//        "일이삼사오일이삼사오일이삼사오",  // 한글 15자
-//        "()[]+-&/_",                  // 허용되는 특수문자
-//        "카카오"                       // 협의된 '카카오' 포함
-//    })
-//    void 단건상품수정_NO_CONTENT_상품이름_유효성_검사(String validName) {
-//        // given
-//        Boolean mdConfirmed = false;
-//
-//        if (validName.equals("카카오")) {
-//            mdConfirmed = true;
-//        }
-//
-//        var request = ProductBuilder.aProduct()
-//            .withName(validName)
-//            .withMdConfirmed(mdConfirmed)
-//            .build();
-//
-//        // when
-//        var response = exchange(HttpMethod.PUT, baseUrl() + "/1", userToken, request,
-//            new ParameterizedTypeReference<Void>() {
-//            });
-//
-//        // then
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-//
-//        Product result = queryProductById(1);
-//        assertThatProductEquals(request, result);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {
-//        "12345 12345 12345",             // 숫자 17자
-//        "Abcde fghij klmno",             // 영어 17자
-//        "일이삼사오 일이삼사오 일이삼사오",   // 한글 17자
-//        "콜라@맛!",                       // 허용되지 않은 특수문자
-//        "카카오커피"                       // 협의되지 않은 '카카오' 포함
-//    })
-//    void 단건상품수정_BAD_REQUEST_상품이름_유효성_검사(String invalidName) {
-//        //given
-//        var request = ProductBuilder.aProduct()
-//            .withName(invalidName)
-//            .build();
-//
-//        // when & then
-//        assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
-//            .isThrownBy(
-//                () -> exchange(HttpMethod.PUT, baseUrl() + "/1", userToken, request,
-//                    new ParameterizedTypeReference<Void>() {
-//                    })
-//            );
-//    }
-//
-//    @Test
-//    void 단건상품수정_UNAUTHORIZED_인증없음() {
-//        //given
-//        var request = ProductBuilder.aProduct().build();
-//
-//        // when & then
-//        assertThatExceptionOfType(HttpClientErrorException.Unauthorized.class)
-//            .isThrownBy(
-//                () -> exchange(HttpMethod.PUT, baseUrl() + "/1", null, request,
-//                    new ParameterizedTypeReference<Void>() {
-//                    })
-//            );
-//    }
+    // PUT
+    @ParameterizedTest
+    @MethodSource("tokenProvider")
+    void 단건상품수정_NO_CONTENT_테스트(String token) {
+        // given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
+        var request = ProductBuilder.aProduct().build();
+
+        // when
+        var response = exchange(HttpMethod.PUT, baseUrl() + "/" + productId, token, request,
+            new ParameterizedTypeReference<Void>() {
+            });
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        Product product = products.findById(productId).get();
+        assertThat(product.getName()).isEqualTo(request.getName());
+        assertThat(product.getPrice()).isEqualTo(request.getPrice());
+        assertThat(product.getImageUrl()).isEqualTo(request.getImageUrl());
+        assertThat(product.getMdConfirmed()).isEqualTo(request.getMdConfirmed());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        " ",
+        "123451234512345",            // 숫자 15자
+        "Abcdefghijklmno",            // 영어 15자
+        "일이삼사오일이삼사오일이삼사오",  // 한글 15자
+        "()[]+-&/_",                  // 허용되는 특수문자
+        "카카오"                       // 협의된 '카카오' 포함
+    })
+    void 단건상품수정_NO_CONTENT_상품이름_유효성_검사(String validName) {
+        // given
+
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
+        Boolean mdConfirmed = false;
+
+        if (validName.equals("카카오")) {
+            mdConfirmed = true;
+        }
+
+        var request = ProductBuilder.aProduct()
+            .withName(validName)
+            .withMdConfirmed(mdConfirmed)
+            .build();
+
+        // when
+        var response = exchange(HttpMethod.PUT, baseUrl() + "/" + productId, userToken, request,
+            new ParameterizedTypeReference<Void>() {
+            });
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "12345 12345 12345",             // 숫자 17자
+        "Abcde fghij klmno",             // 영어 17자
+        "일이삼사오 일이삼사오 일이삼사오",   // 한글 17자
+        "콜라@맛!",                       // 허용되지 않은 특수문자
+        "카카오커피"                       // 협의되지 않은 '카카오' 포함
+    })
+    void 단건상품수정_BAD_REQUEST_상품이름_유효성_검사(String invalidName) {
+        //given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
+        var request = ProductBuilder.aProduct()
+            .withName(invalidName)
+            .build();
+
+        // when & then
+        assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
+            .isThrownBy(
+                () -> exchange(HttpMethod.PUT, baseUrl() + "/" + productId, userToken, request,
+                    new ParameterizedTypeReference<Void>() {
+                    })
+            );
+    }
+
+    @Test
+    void 단건상품수정_UNAUTHORIZED_인증없음() {
+        //given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
+        var request = ProductBuilder.aProduct().build();
+
+        // when & then
+        assertThatExceptionOfType(HttpClientErrorException.Unauthorized.class)
+            .isThrownBy(
+                () -> exchange(HttpMethod.PUT, baseUrl() + "/" + productId, null, request,
+                    new ParameterizedTypeReference<Void>() {
+                    })
+            );
+    }
 
     // DELETE
     @ParameterizedTest
