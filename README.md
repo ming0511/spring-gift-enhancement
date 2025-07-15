@@ -10,8 +10,8 @@
 
 지금까지 작성한 JdbcTemplate 기반 코드를 JPA로 리팩터링한다.
 
-- [ ] 아래의 DDL을 보고 유추하여 엔티티 클래스와 리포지토리 클래스를 작성해 본다.
-    - [ ] member
+- [x] 아래의 DDL을 보고 유추하여 엔티티 클래스와 리포지토리 클래스를 작성해 본다.
+    - [x] member
         ```sql
         create table member
         (
@@ -21,7 +21,7 @@
         primary key (id)
         )
         ```
-    - [ ] product
+    - [x] product
         ```sql
         create table product
         (
@@ -32,7 +32,7 @@
         primary key (id)
         )
         ```
-    - [ ] wish
+    - [x] wish
         ```sql
         create table wish
         (
@@ -53,6 +53,6 @@
         references product
         ```
 
-- [ ] 객체의 참조와 테이블의 외래 키를 매핑해서 객체에서는 참조를 사용하고 테이블에서는 외래 키를 사용할 수 있도록 한다.
-- [ ] `@DataJpaTest`를 사용하여 학습 테스트를 해 본다.
+- [x] 객체의 참조와 테이블의 외래 키를 매핑해서 객체에서는 참조를 사용하고 테이블에서는 외래 키를 사용할 수 있도록 한다.
+- [x] `@DataJpaTest`를 사용하여 학습 테스트를 해 본다.
 
