@@ -1,4 +1,4 @@
-package gift.wish.repository;
+package gift.delete.repository;
 
 import gift.exception.wish.WishNotFoundException;
 import gift.wish.entity.Page;
@@ -14,7 +14,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WishRepositoryImpl implements WishRepository {
+public class WishRepositoryImpl implements WishRepositoryInterface {
 
     private final JdbcTemplate jdbcTemplate;
 
