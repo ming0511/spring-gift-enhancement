@@ -9,10 +9,9 @@ import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
-import gift.delete.repository.MemberRepositoryInterface;
 import gift.member.security.JwtTokenProvider;
+import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -20,18 +19,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class MemberServiceImpl implements MemberService {
 
-    private final MemberRepositoryInterface memberRepository;
-
     private final MemberRepository members;
 
-    public MemberServiceImpl(MemberRepositoryInterface memberRepository, MemberRepository members) {
-        this.memberRepository = memberRepository;
+    public MemberServiceImpl(MemberRepository members) {
         this.members = members;
     }
 
     @Override
     public TokenResponseDto registerMember(RegisterRequestDto registerRequestDto) {
-        if (memberRepository.existsByEmail(registerRequestDto.email())) {
+        if (members.existsByEmail(registerRequestDto.email())) {
             throw new EmailAlreadyExistsException("이미 사용 중인 이메일입니다.");
         }
 
@@ -85,41 +81,40 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public AdminMemberGetResponseDto findMemberById(Long memberId) {
-        Optional<Member> member = members.findById(memberId);
+        Member member = members.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        if (!member.isPresent()) {
-            throw new MemberNotFoundException("회원이 존재하지 않습니다. memberId =" + memberId);
-        }
-
-        return new AdminMemberGetResponseDto(member.get().getMemberId(), member.get().getEmail(),
-            member.get().getPassword(), member.get().getName(), member.get().getRole());
+        return new AdminMemberGetResponseDto(member.getMemberId(), member.getEmail(),
+            member.getPassword(), member.getName(), member.getRole());
     }
 
     @Override
     public void updateMember(Long memberId,
         AdminMemberUpdateRequestDto adminMemberUpdateRequestDto) {
-        Optional<Member> member = members.findById(memberId);
 
-        if (!member.isPresent()) {
-            throw new MemberNotFoundException("회원이 존재하지 않습니다. memberId =" + memberId);
-        }
-
-        // TODO: JPA로 수정.
-        Member updateMember = new Member(memberId,
+        Member member = new Member(memberId,
             adminMemberUpdateRequestDto.email(), adminMemberUpdateRequestDto.password(),
             adminMemberUpdateRequestDto.name(), adminMemberUpdateRequestDto.role());
 
-        memberRepository.updateMember(updateMember);
+        update(memberId, member);
     }
 
     @Override
     public void deleteMember(Long memberId) {
-        Optional<Member> member = members.findById(memberId);
-
-        if (!member.isPresent()) {
-            throw new MemberNotFoundException("회원이 존재하지 않습니다. memberId =" + memberId);
-        }
+        members.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
         members.deleteById(memberId);
+    }
+
+    @Transactional
+    public void update(Long id, Member member) {
+        Member foundMember = members.findById(id)
+            .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+        foundMember.setEmail(member.getEmail());
+        foundMember.setPassword(member.getPassword());
+        foundMember.setName(member.getName());
+        foundMember.setRole(member.getRole());
     }
 }
