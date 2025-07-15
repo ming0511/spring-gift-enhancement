@@ -1,13 +1,11 @@
 package gift.delete.repository;
 
-import gift.exception.wish.WishNotFoundException;
 import gift.wish.entity.Page;
 import gift.wish.entity.Wish;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -46,10 +44,11 @@ public class WishRepositoryImpl implements WishRepositoryInterface {
         String sql = String.format(
             "SELECT wishId, productId, createdDate FROM wishes WHERE memberId = ? ORDER BY %s %s LIMIT ? OFFSET ?",
             page.getSortField(), page.getSortOrder());
-        return jdbcTemplate.query(sql,
-            (rs, RowNum) -> new Wish(rs.getLong("wishId"), rs.getLong("productId"),
-                rs.getTimestamp("createdDate").toLocalDateTime()), memberId,
-            page.getSize(), page.getOffset());
+        return null;
+//        return jdbcTemplate.query(sql,
+//            (rs, RowNum) -> new Wish(rs.getLong("wishId"), rs.getLong("productId"),
+//                rs.getTimestamp("createdDate").toLocalDateTime()), memberId,
+//            page.getSize(), page.getOffset());
     }
 
     @Override
@@ -61,14 +60,15 @@ public class WishRepositoryImpl implements WishRepositoryInterface {
     @Override
     public Wish findByWishId(Long wishId) {
         String sql = "SELECT wishId, memberId, productId, createdDate FROM wishes WHERE wishId = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql,
-                (rs, rowNum) -> new Wish(rs.getLong("wishId"), rs.getLong("memberId"),
-                    rs.getLong("productId"),
-                    rs.getTimestamp("createdDate").toLocalDateTime()), wishId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new WishNotFoundException("위시 상품이 존재하지 않습니다. wishId = " + wishId);
-        }
+        return null;
+//        try {
+//            return jdbcTemplate.queryForObject(sql,
+//                (rs, rowNum) -> new Wish(rs.getLong("wishId"), rs.getLong("memberId"),
+//                    rs.getLong("productId"),
+//                    rs.getTimestamp("createdDate").toLocalDateTime()), wishId);
+//        } catch (EmptyResultDataAccessException e) {
+//            throw new WishNotFoundException("위시 상품이 존재하지 않습니다. wishId = " + wishId);
+//        }
     }
 
     @Override

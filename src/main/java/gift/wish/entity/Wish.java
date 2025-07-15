@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -21,15 +22,20 @@ public class Wish {
     private Long wishId;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "productId", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "createDate", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = LocalDateTime.now();
+    }
 
     protected Wish() {
 
@@ -38,6 +44,12 @@ public class Wish {
     public Wish(Member member, Product product) {
         this.member = member;
         this.product = product;
+    }
+
+    public Wish(Member member, Product product, LocalDateTime createDate) {
+        this.member = member;
+        this.product = product;
+        this.createDate = createDate;
     }
 
     public Wish(Long wishId, Product product, LocalDateTime createDate) {

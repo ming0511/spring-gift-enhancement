@@ -15,20 +15,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "price", nullable = false)
+    @Column(nullable = false)
     private Double price;
 
-    @Column(name = "imageUrl", nullable = false)
+    @Column(nullable = false)
     private String imageUrl;
 
-    @Column(name = "mdConfirmed", nullable = false)
+    @Column(nullable = false)
     private Boolean mdConfirmed;
 
     protected Product() {
-        
+
     }
 
     public Product(String name, Double price, String imageUrl, Boolean mdConfirmed) {
