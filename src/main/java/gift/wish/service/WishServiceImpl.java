@@ -93,7 +93,7 @@ public class WishServiceImpl implements WishService {
 
         List<Wish> wishList = wishRepository.getWishes(memberId, pageInfo);
 
-        Long total = wishRepository.countWishesByMemberId(memberId);
+        Long total = wishes.countByMember_MemberId(memberId);
 
         List<WishGetResponseDto> content = wishList.stream()
             .map(wish -> new WishGetResponseDto(
