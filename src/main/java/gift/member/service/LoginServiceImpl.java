@@ -6,7 +6,6 @@ import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
 import gift.member.security.JwtTokenProvider;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,24 +20,19 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public TokenResponseDto login(LoginRequestDto loginRequestDto) {
         // DB 조회 -> 성공 시 Token 생성, 실패 시 로그인 실패
+        Member member = members.findByEmail(loginRequestDto.email())
+            .orElseThrow(() -> new LoginFailedException("이메일 또는 비밀번호가 올바르지 않습니다."));
 
-        Member foundMember;
-        try {
-            foundMember = members.findByEmail(loginRequestDto.email());
-        } catch (EmptyResultDataAccessException e) {
-            throw new LoginFailedException("이메일 또는 비밀번호가 올바르지 않습니다.");
-        }
-
-        // 성공 시 password 확인 -> 성공 시 Token 생성, 실패 시 로그인 실패(403 Forbidden)
-        if (!foundMember.getPassword().equals(loginRequestDto.password())) {
+        if (!member.getPassword().equals(loginRequestDto.password())) {
             // 실패 시 로그인 실패(403 Forbidden)
             throw new LoginFailedException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         // 성공 시 Token 생성 후 반환
-        String token = new JwtTokenProvider().generateToken(foundMember.getMemberId(),
-            foundMember.getName(),
-            foundMember.getRole());
+        String token = new JwtTokenProvider().generateToken(
+            member.getMemberId(),
+            member.getName(),
+            member.getRole());
 
         return new TokenResponseDto(token);
     }

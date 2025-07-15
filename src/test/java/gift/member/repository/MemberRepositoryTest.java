@@ -34,7 +34,7 @@ public class MemberRepositoryTest {
         String expected = "one@email.com";
         members.save(MemberBuilder.aMember().withEmail(expected).build());
 
-        String actual = members.findByEmail(expected).getEmail();
+        String actual = members.findByEmail(expected).get().getEmail();
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -82,7 +82,7 @@ public class MemberRepositoryTest {
     void existsByEmail() {
         Member expected = MemberBuilder.aMember().build();
         Member savedMember = members.save(expected);
-        
+
         assertThat(members.existsByEmail(savedMember.getEmail())).isTrue();
     }
 }
