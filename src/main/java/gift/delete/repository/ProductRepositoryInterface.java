@@ -1,4 +1,4 @@
-package gift.product.repository;
+package gift.delete.repository;
 
 import gift.product.entity.Product;
 import java.util.List;

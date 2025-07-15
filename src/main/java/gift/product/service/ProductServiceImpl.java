@@ -8,7 +8,7 @@ import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
-import gift.product.repository.ProductRepositoryInterface;
+import gift.delete.repository.ProductRepositoryInterface;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
