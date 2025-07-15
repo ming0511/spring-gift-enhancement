@@ -4,7 +4,7 @@ import gift.exception.member.LoginFailedException;
 import gift.member.dto.LoginRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
-import gift.member.repository.MemberRepository;
+import gift.member.repository.MemberRepositoryInterface;
 import gift.member.security.JwtTokenProvider;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepositoryInterface memberRepository;
 
-    public LoginServiceImpl(MemberRepository memberRepository) {
+    public LoginServiceImpl(MemberRepositoryInterface memberRepository) {
         this.memberRepository = memberRepository;
     }
 

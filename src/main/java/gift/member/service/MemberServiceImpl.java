@@ -8,7 +8,7 @@ import gift.member.dto.AdminMemberUpdateRequestDto;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
-import gift.member.repository.MemberRepository;
+import gift.member.repository.MemberRepositoryInterface;
 import gift.member.security.JwtTokenProvider;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class MemberServiceImpl implements MemberService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepositoryInterface memberRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository) {
+    public MemberServiceImpl(MemberRepositoryInterface memberRepository) {
         this.memberRepository = memberRepository;
     }
 
