@@ -3,6 +3,7 @@ package gift.wish.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import gift.member.Role;
 import gift.member.builder.MemberBuilder;
 import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
@@ -92,14 +93,14 @@ class WishControllerTest {
 
         Member member1 = members.save(
             MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
-                .withName("user").withRole("ROLE_ROLE").build());
+                .withName("user").withRole(Role.ROLE_USER).build());
 
         Member member2 = members.save(
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
-                .withName("admin").withRole("ROLE_ADMIN").build());
+                .withName("admin").withRole(Role.ROLE_ADMIN).build());
 
-        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", "ROLE_USER");
-        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", "ROLE_ADMIN");
+        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.ROLE_USER);
+        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ROLE_ADMIN);
 
         // product
         products.deleteAll();

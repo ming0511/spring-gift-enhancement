@@ -1,5 +1,6 @@
 package gift.member.security;
 
+import gift.member.Role;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,9 +45,9 @@ public class AdminJwtAuthenticationFilter implements Filter {
             return;
         }
 
-        String role = jwtTokenProvider.getRoleFromToken(token);
+        Role role = jwtTokenProvider.getRoleFromToken(token);
 
-        if (!"ROLE_ADMIN".equals(role)) {
+        if (!Role.ROLE_ADMIN.equals(role)) {
             httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "관리자 권한이 없습니다.");
             return;
         }

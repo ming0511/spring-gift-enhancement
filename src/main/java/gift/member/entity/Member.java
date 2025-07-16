@@ -1,7 +1,10 @@
 package gift.member.entity;
 
+import gift.member.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,20 +28,21 @@ public class Member {
     private String name;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     protected Member() {
 
     }
 
-    public Member(String email, String password, String name, String role) {
+    public Member(String email, String password, String name, Role role) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.role = role;
     }
 
-    public Member(Long memberId, String email, String password, String name, String role) {
+    public Member(Long memberId, String email, String password, String name, Role role) {
         this.memberId = memberId;
         this.email = email;
         this.password = password;
@@ -62,7 +66,7 @@ public class Member {
         return name;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
@@ -78,7 +82,7 @@ public class Member {
         this.name = name;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }
