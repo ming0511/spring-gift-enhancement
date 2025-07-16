@@ -1,7 +1,6 @@
 package gift.product.service;
 
 import gift.exception.product.ProductNotFoundException;
-import gift.exception.product.UnapprovedProductException;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
@@ -29,14 +28,11 @@ public class ProductServiceImpl implements ProductService {
             productCreateRequestDto.name().contains("카카오") ? productCreateRequestDto.mdConfirmed()
                 : false;
 
-        if (productCreateRequestDto.name().contains("카카오")
-            && !mdConfirmed) {
-            throw new UnapprovedProductException("협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
-        }
-
         Product product = new Product(productCreateRequestDto.name(),
             productCreateRequestDto.price(), productCreateRequestDto.imageUrl(),
             mdConfirmed);
+
+        product.validate();
 
         Product savedProduct = products.save(product);
 
@@ -74,14 +70,11 @@ public class ProductServiceImpl implements ProductService {
             productUpdateRequestDto.name().contains("카카오") ? productUpdateRequestDto.mdConfirmed()
                 : false;
 
-        if (productUpdateRequestDto.name().contains("카카오")
-            && !mdConfirmed) {
-            throw new UnapprovedProductException("협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
-        }
-
         Product product = new Product(productId, productUpdateRequestDto.name(),
             productUpdateRequestDto.price(), productUpdateRequestDto.imageUrl(),
             mdConfirmed);
+
+        product.validate();
 
         update(productId, product);
     }

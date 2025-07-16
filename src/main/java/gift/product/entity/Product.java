@@ -1,5 +1,6 @@
 package gift.product.entity;
 
+import gift.exception.product.UnapprovedProductException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -81,5 +82,19 @@ public class Product {
 
     public void updateMdConfirmed(Boolean mdConfirmed) {
         this.mdConfirmed = mdConfirmed;
+    }
+
+    public void validate() {
+        validateNameAndMdConfirmed(name, mdConfirmed);
+    }
+
+    private void validateNameAndMdConfirmed(String name, Boolean mdConfirmed) {
+        boolean containsKakao = name != null && name.contains("카카오");
+        boolean confirmed = mdConfirmed != null && mdConfirmed;
+
+        if (containsKakao && !confirmed) {
+            throw new UnapprovedProductException(
+                "협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
+        }
     }
 }
