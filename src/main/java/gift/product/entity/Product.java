@@ -67,19 +67,19 @@ public class Product {
         return mdConfirmed;
     }
 
-    public void setName(String name) {
+    public void rename(String name) {
         this.name = name;
     }
 
-    public void setPrice(Double price) {
+    public void updatePrice(Double price) {
         this.price = price;
     }
 
-    public void setImageUrl(String imageUrl) {
+    public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    public void setMdConfirmed(Boolean mdConfirmed) {
+    public void updateMdConfirmed(Boolean mdConfirmed) {
         this.mdConfirmed = mdConfirmed;
     }
 }

@@ -70,19 +70,19 @@ public class Member {
         return role;
     }
 
-    public void setEmail(String email) {
+    public void changeEmail(String email) {
         this.email = email;
     }
 
-    public void setPassword(String password) {
+    public void changePassword(String password) {
         this.password = password;
     }
 
-    public void setName(String name) {
+    public void rename(String name) {
         this.name = name;
     }
 
-    public void setRole(Role role) {
+    public void assignRole(Role role) {
         this.role = role;
     }
 }

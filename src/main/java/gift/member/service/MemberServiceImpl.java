@@ -112,9 +112,9 @@ public class MemberServiceImpl implements MemberService {
         Member foundMember = members.findById(id)
             .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        foundMember.setEmail(member.getEmail());
-        foundMember.setPassword(member.getPassword());
-        foundMember.setName(member.getName());
-        foundMember.setRole(member.getRole());
+        foundMember.changeEmail(member.getEmail());
+        foundMember.changePassword(member.getPassword());
+        foundMember.rename(member.getName());
+        foundMember.assignRole(member.getRole());
     }
 }

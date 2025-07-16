@@ -99,9 +99,9 @@ public class ProductServiceImpl implements ProductService {
         Product foundProduct = products.findById(id)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
-        foundProduct.setName(product.getName());
-        foundProduct.setPrice(product.getPrice());
-        foundProduct.setImageUrl(product.getImageUrl());
-        foundProduct.setMdConfirmed(product.getMdConfirmed());
+        foundProduct.rename(product.getName());
+        foundProduct.updatePrice(product.getPrice());
+        foundProduct.updateImageUrl(product.getImageUrl());
+        foundProduct.updateMdConfirmed(product.getMdConfirmed());
     }
 }
