@@ -3,6 +3,7 @@ package gift.member.controller;
 import gift.member.dto.AdminMemberCreateRequestDto;
 import gift.member.dto.AdminMemberGetResponseDto;
 import gift.member.dto.AdminMemberUpdateRequestDto;
+import gift.member.dto.MemberCreateCommand;
 import gift.member.service.MemberService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -34,7 +35,7 @@ public class AdminMemberController {
 
     @PostMapping("/create")
     public String createMember(
-        @Valid @ModelAttribute AdminMemberCreateRequestDto adminMemberCreateRequestDto,
+        @Valid @ModelAttribute AdminMemberCreateRequestDto requestDto,
         BindingResult bindingResult, Model model
     ) {
 
@@ -43,8 +44,11 @@ public class AdminMemberController {
             return "member/create-member";
         }
 
+        MemberCreateCommand dto = new MemberCreateCommand(requestDto.email(), requestDto.password(),
+            requestDto.name(), requestDto.role());
+
         try {
-            memberService.saveMember(adminMemberCreateRequestDto);
+            memberService.saveMember(dto);
             return "redirect:/admin/members";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());

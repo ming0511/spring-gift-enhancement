@@ -1,5 +1,6 @@
 package gift.member.controller;
 
+import gift.member.dto.RegisterCommand;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.service.MemberService;
@@ -23,10 +24,12 @@ public class RegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<TokenResponseDto> registerMember(
-        @Valid @RequestBody RegisterRequestDto registerRequestDto) {
+        @Valid @RequestBody RegisterRequestDto requestDto) {
 
-        return new ResponseEntity<>(memberService.registerMember(registerRequestDto),
-            HttpStatus.CREATED);
+        RegisterCommand dto = new RegisterCommand(requestDto.email(), requestDto.password(),
+            requestDto.name(), requestDto.role());
+
+        return new ResponseEntity<>(memberService.registerMember(dto), HttpStatus.CREATED);
 
     }
 }

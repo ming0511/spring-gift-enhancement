@@ -1,19 +1,20 @@
 package gift.member.service;
 
-import gift.member.dto.AdminMemberCreateRequestDto;
 import gift.member.dto.AdminMemberGetResponseDto;
 import gift.member.dto.AdminMemberUpdateRequestDto;
+import gift.member.dto.MemberCreateCommand;
+import gift.member.dto.RegisterCommand;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import java.util.List;
 
 public interface MemberService {
 
-    TokenResponseDto registerMember(RegisterRequestDto registerRequestDto);
+    TokenResponseDto registerMember(RegisterCommand dto);
 
     void findMemberByEmail(RegisterRequestDto registerRequestDto);
 
-    void saveMember(AdminMemberCreateRequestDto adminMemberCreateRequestDto);
+    void saveMember(MemberCreateCommand dto);
 
     List<AdminMemberGetResponseDto> findAllMembers();
 

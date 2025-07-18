@@ -2,9 +2,10 @@ package gift.member.service;
 
 import gift.exception.member.EmailAlreadyExistsException;
 import gift.exception.member.MemberNotFoundException;
-import gift.member.dto.AdminMemberCreateRequestDto;
 import gift.member.dto.AdminMemberGetResponseDto;
 import gift.member.dto.AdminMemberUpdateRequestDto;
+import gift.member.dto.MemberCreateCommand;
+import gift.member.dto.RegisterCommand;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
@@ -26,13 +27,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public TokenResponseDto registerMember(RegisterRequestDto registerRequestDto) {
-        if (members.existsByEmail(registerRequestDto.email())) {
+    public TokenResponseDto registerMember(RegisterCommand dto) {
+        if (members.existsByEmail(dto.email())) {
             throw new EmailAlreadyExistsException("이미 사용 중인 이메일입니다.");
         }
 
-        Member member = new Member(registerRequestDto.email(), registerRequestDto.password(),
-            registerRequestDto.name(), registerRequestDto.role());
+        Member member = new Member(dto.email(), dto.password(), dto.name(), dto.role());
 
         Member savedMember = members.save(member);
 
@@ -55,11 +55,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void saveMember(AdminMemberCreateRequestDto adminMemberCreateRequestDto) {
+    public void saveMember(MemberCreateCommand dto) {
 
-        Member member = new Member(adminMemberCreateRequestDto.email(),
-            adminMemberCreateRequestDto.password(), adminMemberCreateRequestDto.name(),
-            adminMemberCreateRequestDto.role());
+        Member member = new Member(dto.email(), dto.password(), dto.name(), dto.role());
 
         members.save(member);
     }
