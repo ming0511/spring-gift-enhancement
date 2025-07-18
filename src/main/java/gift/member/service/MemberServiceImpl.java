@@ -6,7 +6,6 @@ import gift.member.dto.AdminMemberGetResponseDto;
 import gift.member.dto.MemberCreateCommand;
 import gift.member.dto.MemberUpdateCommand;
 import gift.member.dto.RegisterCommand;
-import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
@@ -44,13 +43,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void findMemberByEmail(RegisterRequestDto registerRequestDto) {
+    public void findMemberByEmail(String email) {
 
         try {
-            members.findByEmail(registerRequestDto.email());
+            members.findByEmail(email);
         } catch (EmptyResultDataAccessException e) {
-            throw new MemberNotFoundException(
-                "이메일이 존재하지 않습니다. email =" + registerRequestDto.email());
+            throw new MemberNotFoundException("이메일이 존재하지 않습니다. email =" + email);
         }
     }
 
