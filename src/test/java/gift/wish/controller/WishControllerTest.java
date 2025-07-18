@@ -93,14 +93,14 @@ class WishControllerTest {
 
         Member member1 = members.save(
             MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
-                .withName("user").withRole(Role.ROLE_USER).build());
+                .withName("user").withRole(Role.USER).build());
 
         Member member2 = members.save(
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
-                .withName("admin").withRole(Role.ROLE_ADMIN).build());
+                .withName("admin").withRole(Role.ADMIN).build());
 
-        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.ROLE_USER);
-        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ROLE_ADMIN);
+        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.USER);
+        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ADMIN);
 
         // product
         products.deleteAll();

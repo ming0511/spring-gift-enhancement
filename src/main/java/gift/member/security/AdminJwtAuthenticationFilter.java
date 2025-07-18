@@ -47,7 +47,7 @@ public class AdminJwtAuthenticationFilter implements Filter {
 
         Role role = jwtTokenProvider.getRoleFromToken(token);
 
-        if (!Role.ROLE_ADMIN.equals(role)) {
+        if (!Role.ADMIN.equals(role)) {
             httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "관리자 권한이 없습니다.");
             return;
         }
