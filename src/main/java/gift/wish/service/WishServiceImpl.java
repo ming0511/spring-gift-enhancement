@@ -26,15 +26,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class WishServiceImpl implements WishService {
 
-    private final WishRepository wishes;
-    private final MemberRepository members;
-    private final ProductRepository products;
+    private final WishRepository wishRepository;
+    private final MemberRepository memberRepository;
+    private final ProductRepository productRepository;
 
-    public WishServiceImpl(WishRepository wishes,
-        MemberRepository members, ProductRepository products) {
-        this.wishes = wishes;
-        this.members = members;
-        this.products = products;
+    public WishServiceImpl(WishRepository wishRepository,
+        MemberRepository memberRepository, ProductRepository productRepository) {
+        this.wishRepository = wishRepository;
+        this.memberRepository = memberRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -42,20 +42,21 @@ public class WishServiceImpl implements WishService {
         // TODO: 이미 추가한 상품인지 확인하기(WishRepository.existsByMemberAndProduct) 실패 시 예외 처리(이미 존재하는 위시) -> 이후 수량 관련해서 추가.
         Long productId = dto.productId();
 
-        Boolean exists = wishes.existsByMember_MemberIdAndProduct_ProductId(memberId, productId);
+        Boolean exists = wishRepository.existsByMember_MemberIdAndProduct_ProductId(memberId,
+            productId);
         if (exists) {
             throw new IllegalStateException("이미 위시리스트에 추가하셨습니다.");
         }
 
-        Member member = members.findById(memberId).orElseThrow(
+        Member member = memberRepository.findById(memberId).orElseThrow(
             () -> new MemberNotFoundException("회원이 존재하지 않습니다. memberId =" + memberId)
         );
-        Product product = products.findById(productId).orElseThrow(
+        Product product = productRepository.findById(productId).orElseThrow(
             () -> new ProductNotFoundException("상품이 존재하지 않습니다. productId =" + productId)
         );
 
         Wish wish = new Wish(member, product);
-        Wish savedWish = wishes.save(wish);
+        Wish savedWish = wishRepository.save(wish);
 
         return new WishCreateResponseDto(savedWish.getWishId(), savedWish.getMemberId(),
             savedWish.getProductId(),
@@ -72,7 +73,7 @@ public class WishServiceImpl implements WishService {
             }
         }
 
-        Page<Wish> wishPage = wishes.findByMember_MemberId(memberId, pageable);
+        Page<Wish> wishPage = wishRepository.findByMember_MemberId(memberId, pageable);
 
         List<WishGetResponseDto> content = wishPage.getContent().stream()
             .map(wish -> new WishGetResponseDto(
@@ -92,7 +93,7 @@ public class WishServiceImpl implements WishService {
 
     @Override
     public void deleteWish(Long memberId, Long wishId) {
-        Wish wish = wishes.findById(wishId).orElseThrow(
+        Wish wish = wishRepository.findById(wishId).orElseThrow(
             () -> new WishNotFoundException("위시 상품이 존재하지 않습니다. wishId = " + wishId)
         );
 
@@ -100,7 +101,7 @@ public class WishServiceImpl implements WishService {
             throw new WishlistAccessDeniedException("다른 사용자의 위시리스트에 접근할 수 없습니다.");
         }
 
-        wishes.deleteById(wishId);
+        wishRepository.deleteById(wishId);
     }
 
 }

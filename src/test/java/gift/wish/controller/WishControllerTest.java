@@ -46,13 +46,13 @@ class WishControllerTest {
     private final RestClient client = RestClient.builder().build();
 
     @Autowired
-    private WishRepository wishes;
+    private WishRepository wishRepository;
 
     @Autowired
-    private MemberRepository members;
+    private MemberRepository memberRepository;
 
     @Autowired
-    private ProductRepository products;
+    private ProductRepository productRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -91,13 +91,13 @@ class WishControllerTest {
 
     @BeforeAll
     void beforeAll() {
-        members.deleteAll();
+        memberRepository.deleteAll();
 
-        Member member1 = members.save(
+        Member member1 = memberRepository.save(
             MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
                 .withName("user").withRole(Role.USER).build());
 
-        Member member2 = members.save(
+        Member member2 = memberRepository.save(
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
                 .withName("admin").withRole(Role.ADMIN).build());
 
@@ -107,25 +107,25 @@ class WishControllerTest {
             Role.ADMIN);
 
         // product
-        products.deleteAll();
+        productRepository.deleteAll();
 
-        Product product1 = products.save(
+        Product product1 = productRepository.save(
             ProductBuilder.aProduct().withName("one").withPrice(1.0).withImageUrl("https://1.img")
                 .withMdConfirmed(false).build());
 
-        Product product2 = products.save(
+        Product product2 = productRepository.save(
             ProductBuilder.aProduct().withName("two").withPrice(2.0).withImageUrl("https://2.img")
                 .withMdConfirmed(false).build());
 
-        Product product3 = products.save(
+        Product product3 = productRepository.save(
             ProductBuilder.aProduct().withName("three").withPrice(3.0).withImageUrl("https://3.img")
                 .withMdConfirmed(false).build());
 
-        wishes.deleteAll();
+        wishRepository.deleteAll();
 
-        wishes.save(new Wish(member1, product1));
-        wishes.save(new Wish(member1, product2));
-        wishes.save(new Wish(member2, product1));
+        wishRepository.save(new Wish(member1, product1));
+        wishRepository.save(new Wish(member1, product2));
+        wishRepository.save(new Wish(member2, product1));
     }
 
     // POST
@@ -134,7 +134,7 @@ class WishControllerTest {
     void 위시상품추가_CREATED_성공(String token) {
         // given
 
-        Product product = products.save(ProductBuilder.aProduct().build());
+        Product product = productRepository.save(ProductBuilder.aProduct().build());
 
         var request = new WishCreateRequestDto(product.getProductId());
 

@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private final MemberRepository members;
+    private final MemberRepository memberRepository;
 
-    public LoginServiceImpl(MemberRepository members) {
-        this.members = members;
+    public LoginServiceImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public TokenResponseDto login(LoginCommand dto) {
         // DB 조회 -> 성공 시 Token 생성, 실패 시 로그인 실패
-        Member member = members.findByEmail(dto.email())
+        Member member = memberRepository.findByEmail(dto.email())
             .orElseThrow(() -> new LoginFailedException("이메일 또는 비밀번호가 올바르지 않습니다."));
 
         if (!member.getPassword().equals(dto.password())) {

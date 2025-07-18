@@ -18,10 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository products;
+    private final ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductRepository products) {
-        this.products = products;
+    public ProductServiceImpl(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.validate();
 
-        Product savedProduct = products.save(product);
+        Product savedProduct = productRepository.save(product);
 
         return new ProductCreateResponseDto(savedProduct.getProductId(), savedProduct.getName(),
             savedProduct.getPrice(), savedProduct.getImageUrl(), savedProduct.getMdConfirmed());
@@ -42,9 +42,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductPageResponseDto findAllProducts(Pageable pageable) {
 
-        Page<Product> ProductPage = products.findAll(pageable);
+        Page<Product> Products = productRepository.findAll(pageable);
 
-        List<ProductGetResponseDto> content = ProductPage.getContent().stream()
+        List<ProductGetResponseDto> content = Products.getContent().stream()
             .map(product -> new ProductGetResponseDto(
                 product.getProductId(),
                 product.getName(),
@@ -55,15 +55,15 @@ public class ProductServiceImpl implements ProductService {
 
         return new ProductPageResponseDto(
             content,
-            ProductPage.getNumber(),
-            ProductPage.getSize(),
-            ProductPage.getTotalElements(),
-            ProductPage.getTotalPages());
+            Products.getNumber(),
+            Products.getSize(),
+            Products.getTotalElements(),
+            Products.getTotalPages());
     }
 
     @Override
     public ProductGetResponseDto findProductById(Long productId) {
-        Product product = products.findById(productId)
+        Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         return new ProductGetResponseDto(product.getProductId(), product.getName(),
@@ -84,15 +84,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long productId) {
-        products.findById(productId)
+        productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
-        products.deleteById(productId);
+        productRepository.deleteById(productId);
     }
 
     @Transactional
     public void update(Long id, Product product) {
-        Product foundProduct = products.findById(id)
+        Product foundProduct = productRepository.findById(id)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         foundProduct.rename(product.getName());
