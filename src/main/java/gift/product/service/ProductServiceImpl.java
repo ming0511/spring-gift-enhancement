@@ -1,7 +1,7 @@
 package gift.product.service;
 
 import gift.exception.product.ProductNotFoundException;
-import gift.product.dto.ProductCreateRequestDto;
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductUpdateRequestDto;
@@ -22,15 +22,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductCreateResponseDto saveProduct(ProductCreateRequestDto productCreateRequestDto) {
+    public ProductCreateResponseDto saveProduct(ProductCreateCommand dto) {
 
         Boolean mdConfirmed =
-            productCreateRequestDto.name().contains("카카오") ? productCreateRequestDto.mdConfirmed()
+            dto.name().contains("카카오") ? dto.mdConfirmed()
                 : false;
 
-        Product product = new Product(productCreateRequestDto.name(),
-            productCreateRequestDto.price(), productCreateRequestDto.imageUrl(),
-            mdConfirmed);
+        Product product = new Product(dto.name(), dto.price(), dto.imageUrl(), mdConfirmed);
 
         product.validate();
 

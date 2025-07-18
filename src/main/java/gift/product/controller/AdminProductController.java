@@ -1,5 +1,6 @@
 package gift.product.controller;
 
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductUpdateRequestDto;
@@ -34,7 +35,7 @@ public class AdminProductController {
 
     @PostMapping("/create")
     public String createProduct(
-        @Valid @ModelAttribute ProductCreateRequestDto productCreateRequestDto,
+        @Valid @ModelAttribute ProductCreateRequestDto requestDto,
         BindingResult bindingResult, Model model
     ) {
 
@@ -43,8 +44,11 @@ public class AdminProductController {
             return "product/create-product";
         }
 
+        ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
         try {
-            productService.saveProduct(productCreateRequestDto);
+            productService.saveProduct(dto);
             return "redirect:/admin/products";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());

@@ -1,5 +1,6 @@
 package gift.product.controller;
 
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
@@ -31,10 +32,12 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductCreateResponseDto> createProduct(
-        @Valid @RequestBody ProductCreateRequestDto productCreateRequestDto) {
+        @Valid @RequestBody ProductCreateRequestDto requestDto) {
 
-        return new ResponseEntity<>(productService.saveProduct(productCreateRequestDto),
-            HttpStatus.CREATED);
+        ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
+        return new ResponseEntity<>(productService.saveProduct(dto), HttpStatus.CREATED);
     }
 
     @GetMapping
