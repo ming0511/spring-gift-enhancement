@@ -1,6 +1,7 @@
 package gift.wish.controller;
 
 import gift.wish.annotation.LoginMember;
+import gift.wish.dto.WishCreateCommand;
 import gift.wish.dto.WishCreateRequestDto;
 import gift.wish.dto.WishCreateResponseDto;
 import gift.wish.dto.WishGetRequestDto;
@@ -30,10 +31,11 @@ public class WishController {
 
     @PostMapping
     public ResponseEntity<WishCreateResponseDto> addWish(@LoginMember Long memberId,
-        @Valid @RequestBody WishCreateRequestDto wishCreateRequestDto) {
+        @Valid @RequestBody WishCreateRequestDto requestDto) {
 
-        return new ResponseEntity<>(wishService.addWish(memberId, wishCreateRequestDto),
-            HttpStatus.CREATED);
+        WishCreateCommand dto = new WishCreateCommand(requestDto.productId());
+
+        return new ResponseEntity<>(wishService.addWish(memberId, dto), HttpStatus.CREATED);
     }
 
     // /api/wishes?page=0&size=10&sort=createdDate,desc

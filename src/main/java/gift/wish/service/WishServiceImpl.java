@@ -1,5 +1,6 @@
 package gift.wish.service;
 
+import gift.delete.repository.WishRepositoryInterface;
 import gift.exception.member.MemberNotFoundException;
 import gift.exception.product.ProductNotFoundException;
 import gift.exception.wish.InvalidPageException;
@@ -9,7 +10,7 @@ import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
-import gift.wish.dto.WishCreateRequestDto;
+import gift.wish.dto.WishCreateCommand;
 import gift.wish.dto.WishCreateResponseDto;
 import gift.wish.dto.WishGetRequestDto;
 import gift.wish.dto.WishGetResponseDto;
@@ -17,7 +18,6 @@ import gift.wish.dto.WishPageResponseDto;
 import gift.wish.entity.Page;
 import gift.wish.entity.Wish;
 import gift.wish.repository.WishRepository;
-import gift.delete.repository.WishRepositoryInterface;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -40,9 +40,9 @@ public class WishServiceImpl implements WishService {
     }
 
     @Override
-    public WishCreateResponseDto addWish(Long memberId, WishCreateRequestDto wishCreateRequestDto) {
+    public WishCreateResponseDto addWish(Long memberId, WishCreateCommand dto) {
         // TODO: 이미 추가한 상품인지 확인하기(WishRepository.existsByMemberAndProduct) 실패 시 예외 처리(이미 존재하는 위시) -> 이후 수량 관련해서 추가.
-        Long productId = wishCreateRequestDto.productId();
+        Long productId = dto.productId();
 
         Boolean exists = wishes.existsByMember_MemberIdAndProduct_ProductId(memberId, productId);
         if (exists) {
