@@ -1,5 +1,6 @@
 package gift.member.dto;
 
+import gift.member.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,7 +14,7 @@ public record AdminMemberCreateRequestDto(
     @NotNull(message = "Member Name must not be null.")
     String name,
 
-    String role
+    Role role
 ) {
 
 }

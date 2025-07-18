@@ -1,5 +1,6 @@
 package gift.member.builder;
 
+import gift.member.Role;
 import gift.member.entity.Member;
 
 public class MemberBuilder {
@@ -7,7 +8,7 @@ public class MemberBuilder {
     private String email = "default@email.com";
     private String password = "default";
     private String name = "user";
-    private String role = "ROLE_DEFAULT";
+    private Role role = Role.ROLE_USER;
 
     private MemberBuilder() {
 
@@ -32,7 +33,7 @@ public class MemberBuilder {
         return this;
     }
 
-    public MemberBuilder withRole(String role) {
+    public MemberBuilder withRole(Role role) {
         this.role = role;
         return this;
     }
@@ -53,7 +54,7 @@ public class MemberBuilder {
         return name;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 }

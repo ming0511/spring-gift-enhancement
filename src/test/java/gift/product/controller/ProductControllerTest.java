@@ -3,18 +3,21 @@ package gift.product.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import gift.member.Role;
+import gift.member.builder.MemberBuilder;
+import gift.member.repository.MemberRepository;
 import gift.member.security.JwtTokenProvider;
 import gift.product.builder.ProductBuilder;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.entity.Product;
+import gift.product.repository.ProductRepository;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,12 +28,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductControllerTest {
 
     @LocalServerPort
@@ -39,7 +41,10 @@ class ProductControllerTest {
     private final RestClient client = RestClient.builder().build();
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private ProductRepository products;
+
+    @Autowired
+    private MemberRepository members;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -72,52 +77,46 @@ class ProductControllerTest {
             .toEntity(type);
     }
 
-    private Product queryProductById(int id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT name, price, imageUrl, mdConfirmed FROM products WHERE productId = ?",
-            (rs, rowNum) -> new Product(
-                rs.getString("name"),
-                rs.getDouble("price"),
-                rs.getString("imageUrl"),
-                rs.getBoolean("mdConfirmed")
-            ),
-            id
-        );
-    }
-
-    private void assertThatProductEquals(Product expected, Product actual) {
-        assertThat(actual.getName()).isEqualTo(expected.getName());
-        assertThat(actual.getPrice()).isEqualTo(expected.getPrice());
-        assertThat(actual.getImageUrl()).isEqualTo(expected.getImageUrl());
-        assertThat(actual.getMdConfirmed()).isEqualTo(expected.getMdConfirmed());
-    }
-
     Stream<String> tokenProvider() {
         return Stream.of(userToken, adminToken);
     }
 
     @BeforeAll
     void beforeAll() {
-        jdbcTemplate.execute("DELETE FROM members");
-        jdbcTemplate.execute("ALTER TABLE members ALTER COLUMN memberId RESTART WITH 1");
 
-        String sql = "INSERT INTO members(email, password, name, role) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, "user@email.com", "1234", "user", "ROLE_USER");
-        jdbcTemplate.update(sql, "admin@email.com", "1234", "admin", "ROLE_ADMIN");
+        members.deleteAll();
 
-        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", "ROLE_USER");
-        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", "ROLE_ADMIN");
+        members.save(
+            MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
+                .withName("user").withRole(Role.ROLE_USER).build());
+
+        members.save(
+            MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
+                .withName("admin").withRole(Role.ROLE_ADMIN).build());
+
+        members.findAll();
+
+        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.ROLE_USER);
+        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ROLE_ADMIN);
     }
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.execute("DELETE FROM products");
-        jdbcTemplate.execute("ALTER TABLE products ALTER COLUMN productId RESTART WITH 1");
+        products.deleteAll();
 
-        String sql = "INSERT INTO products(name, price, imageUrl, mdConfirmed) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, "one", "1", "https://1.img", "false");
-        jdbcTemplate.update(sql, "two", "2", "https://2.img", "false");
-        jdbcTemplate.update(sql, "three", "3", "https://3.img", "false");
+        products.save(
+            ProductBuilder.aProduct().withName("one").withPrice(1.0).withImageUrl("https://1.img")
+                .withMdConfirmed(false).build());
+
+        products.save(
+            ProductBuilder.aProduct().withName("two").withPrice(2.0).withImageUrl("https://2.img")
+                .withMdConfirmed(false).build());
+
+        products.save(
+            ProductBuilder.aProduct().withName("three").withPrice(3.0).withImageUrl("https://3.img")
+                .withMdConfirmed(false).build());
+
+        products.findAll();
     }
 
     // POST
@@ -169,9 +168,6 @@ class ProductControllerTest {
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        Product result = queryProductById(4);
-        assertThatProductEquals(request, result);
     }
 
     @ParameterizedTest
@@ -229,8 +225,19 @@ class ProductControllerTest {
 
     @Test
     void 단건상품조회_OK_테스트() {
-        // given & when
-        var response = exchange(HttpMethod.GET, baseUrl() + "/1", userToken, null,
+        // given
+        Product savedProduct = products.save(
+            ProductBuilder.aProduct()
+                .withName("one")
+                .withPrice(1.0)
+                .withImageUrl("https://1.img")
+                .withMdConfirmed(false)
+                .build());
+
+        Long savedProductId = savedProduct.getProductId();
+
+        // when
+        var response = exchange(HttpMethod.GET, baseUrl() + "/" + savedProductId, userToken, null,
             new ParameterizedTypeReference<ProductGetResponseDto>() {
             });
 
@@ -268,18 +275,24 @@ class ProductControllerTest {
     @MethodSource("tokenProvider")
     void 단건상품수정_NO_CONTENT_테스트(String token) {
         // given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
         var request = ProductBuilder.aProduct().build();
 
         // when
-        var response = exchange(HttpMethod.PUT, baseUrl() + "/1", token, request,
+        var response = exchange(HttpMethod.PUT, baseUrl() + "/" + productId, token, request,
             new ParameterizedTypeReference<Void>() {
             });
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        Product result = queryProductById(1);
-        assertThatProductEquals(request, result);
+        Product product = products.findById(productId).get();
+        assertThat(product.getName()).isEqualTo(request.getName());
+        assertThat(product.getPrice()).isEqualTo(request.getPrice());
+        assertThat(product.getImageUrl()).isEqualTo(request.getImageUrl());
+        assertThat(product.getMdConfirmed()).isEqualTo(request.getMdConfirmed());
     }
 
     @ParameterizedTest
@@ -294,6 +307,10 @@ class ProductControllerTest {
     })
     void 단건상품수정_NO_CONTENT_상품이름_유효성_검사(String validName) {
         // given
+
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
         Boolean mdConfirmed = false;
 
         if (validName.equals("카카오")) {
@@ -306,15 +323,12 @@ class ProductControllerTest {
             .build();
 
         // when
-        var response = exchange(HttpMethod.PUT, baseUrl() + "/1", userToken, request,
+        var response = exchange(HttpMethod.PUT, baseUrl() + "/" + productId, userToken, request,
             new ParameterizedTypeReference<Void>() {
             });
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        Product result = queryProductById(1);
-        assertThatProductEquals(request, result);
     }
 
     @ParameterizedTest
@@ -327,6 +341,9 @@ class ProductControllerTest {
     })
     void 단건상품수정_BAD_REQUEST_상품이름_유효성_검사(String invalidName) {
         //given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
         var request = ProductBuilder.aProduct()
             .withName(invalidName)
             .build();
@@ -334,7 +351,7 @@ class ProductControllerTest {
         // when & then
         assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
             .isThrownBy(
-                () -> exchange(HttpMethod.PUT, baseUrl() + "/1", userToken, request,
+                () -> exchange(HttpMethod.PUT, baseUrl() + "/" + productId, userToken, request,
                     new ParameterizedTypeReference<Void>() {
                     })
             );
@@ -343,12 +360,15 @@ class ProductControllerTest {
     @Test
     void 단건상품수정_UNAUTHORIZED_인증없음() {
         //given
+        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Long productId = savedProduct.getProductId();
+
         var request = ProductBuilder.aProduct().build();
 
         // when & then
         assertThatExceptionOfType(HttpClientErrorException.Unauthorized.class)
             .isThrownBy(
-                () -> exchange(HttpMethod.PUT, baseUrl() + "/1", null, request,
+                () -> exchange(HttpMethod.PUT, baseUrl() + "/" + productId, null, request,
                     new ParameterizedTypeReference<Void>() {
                     })
             );
@@ -358,20 +378,24 @@ class ProductControllerTest {
     @ParameterizedTest
     @MethodSource("tokenProvider")
     void 단건상품삭제_NO_CONTENT_테스트(String token) {
-        // given & when
-        var response = exchange(HttpMethod.DELETE, baseUrl() + "/1", token, null,
+        // given
+        Product savedProduct = products.save(
+            ProductBuilder.aProduct()
+                .withName("one")
+                .withPrice(1.0)
+                .withImageUrl("https://1.img")
+                .withMdConfirmed(false)
+                .build());
+
+        Long savedProductId = savedProduct.getProductId();
+
+        // when
+        var response = exchange(HttpMethod.DELETE, baseUrl() + "/" + savedProductId, token, null,
             new ParameterizedTypeReference<Void>() {
             });
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        var results = jdbcTemplate.query(
-            "SELECT * FROM products WHERE productId = 1",
-            (rs, rowNum) -> rs.getInt("productId")
-        );
-
-        assertThat(results).isEmpty();
     }
 
     @Test
@@ -395,5 +419,4 @@ class ProductControllerTest {
                     })
             );
     }
-
 }

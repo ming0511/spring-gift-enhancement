@@ -1,20 +1,11 @@
 package gift.wish.repository;
 
-import gift.wish.entity.Page;
 import gift.wish.entity.Wish;
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface WishRepository {
+public interface WishRepository extends JpaRepository<Wish, Long> {
 
-    Long addWish(Wish wish);
+    Boolean existsByMember_MemberIdAndProduct_ProductId(Long memberId, Long productId);
 
-    List<Wish> getWishes(Long memberId, Page page);
-
-    void deleteWish(Long wishId);
-
-    Wish findByWishId(Long wishId);
-
-    Long countWishesByMemberId(Long memberId);
-
-    Boolean existsByMemberAndProduct(Long memberId, Long productId);
+    Long countByMember_MemberId(Long memberId);
 }

@@ -1,12 +1,36 @@
 package gift.product.entity;
 
+import gift.exception.product.UnapprovedProductException;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "products")
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
-    private final String name;
-    private final Double price;
-    private final String imageUrl;
-    private final Boolean mdConfirmed;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private Double price;
+
+    @Column(nullable = false)
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private Boolean mdConfirmed;
+
+    protected Product() {
+
+    }
 
     public Product(String name, Double price, String imageUrl, Boolean mdConfirmed) {
         this.name = name;
@@ -42,5 +66,35 @@ public class Product {
 
     public Boolean getMdConfirmed() {
         return mdConfirmed;
+    }
+
+    public void rename(String name) {
+        this.name = name;
+    }
+
+    public void updatePrice(Double price) {
+        this.price = price;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void updateMdConfirmed(Boolean mdConfirmed) {
+        this.mdConfirmed = mdConfirmed;
+    }
+
+    public void validate() {
+        validateNameAndMdConfirmed(name, mdConfirmed);
+    }
+
+    private void validateNameAndMdConfirmed(String name, Boolean mdConfirmed) {
+        boolean containsKakao = name != null && name.contains("카카오");
+        boolean confirmed = mdConfirmed != null && mdConfirmed;
+
+        if (containsKakao && !confirmed) {
+            throw new UnapprovedProductException(
+                "협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
+        }
     }
 }

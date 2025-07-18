@@ -1,14 +1,13 @@
 package gift.member.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import gift.member.builder.MemberBuilder;
 import gift.member.dto.TokenResponseDto;
+import gift.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -16,12 +15,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AuthControllerTest {
+class RegisterControllerTest {
 
     @LocalServerPort
     private int port;
@@ -29,7 +27,7 @@ class AuthControllerTest {
     private final RestClient client = RestClient.builder().build();
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private MemberRepository members;
 
     private String baseUrl() {
         return "http://localhost:" + port + "/api/members";
@@ -57,50 +55,47 @@ class AuthControllerTest {
     @BeforeEach
     void setUp() {
 
-        jdbcTemplate.execute("DELETE FROM members");
-        jdbcTemplate.execute("ALTER TABLE members ALTER COLUMN memberId RESTART WITH 1");
+        members.deleteAll();
 
-        String sql = "INSERT INTO members(email, password, name) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, "one@email.com", "1234", "user");
+        members.save(
+            MemberBuilder.aMember().withEmail("one@email.com").withPassword("1234").build());
+        members.save(
+            MemberBuilder.aMember().withEmail("two@email.com").withPassword("1234").build());
+        members.save(
+            MemberBuilder.aMember().withEmail("three@email.com").withPassword("1234").build());
+
+        members.findAll();
     }
 
     @Test
-    void 로그인_OK_테스트() {
+    void 회원가입_CREATED_테스트() {
         // given
-        var request = MemberBuilder.aMember()
-            .withEmail("one@email.com")
-            .withPassword("1234")
-            .build();
+        var request = MemberBuilder.aMember().build();
 
         // when
-        var response = exchange(HttpMethod.POST, baseUrl() + "/login", request,
+        var response = exchange(HttpMethod.POST, baseUrl() + "/register", request,
             new ParameterizedTypeReference<TokenResponseDto>() {
             });
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "invalid@email.com, 1234",
-        "one@email.com, wrongpassword",
-        "invalid@email.com, wrongpassword"
-    })
-    void 로그인_FORBIDDEN_로그인실패(String email, String password) {
+    @Test
+    void 회원가입_BAD_REQUEST_이미존재하는이메일() {
         // given
         var request = MemberBuilder.aMember()
-            .withEmail(email)
-            .withPassword(password)
+            .withEmail("one@email.com")
             .build();
 
         // when & then
-        assertThatExceptionOfType(HttpClientErrorException.Forbidden.class)
+        assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
             .isThrownBy(
-                () -> exchange(HttpMethod.POST, baseUrl() + "/login", request,
+                () -> exchange(HttpMethod.POST, baseUrl() + "/register", request,
                     new ParameterizedTypeReference<TokenResponseDto>() {
                     })
             );
     }
+
 }

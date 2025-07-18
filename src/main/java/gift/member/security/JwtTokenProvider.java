@@ -1,5 +1,6 @@
 package gift.member.security;
 
+import gift.member.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,7 +13,7 @@ public class JwtTokenProvider {
     private final String secretKey = "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=";
     private final Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
-    public String generateToken(Long memberId, String email, String role) {
+    public String generateToken(Long memberId, String email, Role role) {
         return Jwts.builder()
             .setSubject(memberId.toString())
             .claim("email", email)
@@ -43,13 +44,13 @@ public class JwtTokenProvider {
         return Long.valueOf(claims.getSubject());
     }
 
-    public String getRoleFromToken(String token) {
+    public Role getRoleFromToken(String token) {
         Claims claims = Jwts.parser()
             .setSigningKey(key)
             .build()
             .parseClaimsJws(token)
             .getBody();
 
-        return claims.get("role", String.class);
+        return claims.get("role", Role.class);
     }
 }

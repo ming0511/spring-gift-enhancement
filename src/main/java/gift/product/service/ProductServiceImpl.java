@@ -1,12 +1,13 @@
 package gift.product.service;
 
-import gift.exception.product.UnapprovedProductException;
+import gift.exception.product.ProductNotFoundException;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
+    private final ProductRepository products;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductServiceImpl(ProductRepository products) {
+        this.products = products;
     }
 
     @Override
@@ -27,18 +28,13 @@ public class ProductServiceImpl implements ProductService {
             productCreateRequestDto.name().contains("카카오") ? productCreateRequestDto.mdConfirmed()
                 : false;
 
-        if (productCreateRequestDto.name().contains("카카오")
-            && !mdConfirmed) {
-            throw new UnapprovedProductException("협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
-        }
-
         Product product = new Product(productCreateRequestDto.name(),
             productCreateRequestDto.price(), productCreateRequestDto.imageUrl(),
             mdConfirmed);
 
-        Long productId = productRepository.saveProduct(product);
+        product.validate();
 
-        Product savedProduct = productRepository.findProductById(productId);
+        Product savedProduct = products.save(product);
 
         return new ProductCreateResponseDto(savedProduct.getProductId(), savedProduct.getName(),
             savedProduct.getPrice(), savedProduct.getImageUrl(), savedProduct.getMdConfirmed());
@@ -46,9 +42,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductGetResponseDto> findAllProducts() {
-        List<Product> products = productRepository.findAllProducts();
+        List<Product> productList = products.findAll();
 
-        return products.stream()
+        return productList.stream()
             .map(product -> new ProductGetResponseDto(
                 product.getProductId(),
                 product.getName(),
@@ -61,7 +57,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductGetResponseDto findProductById(Long productId) {
-        Product product = productRepository.findProductById(productId);
+        Product product = products.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         return new ProductGetResponseDto(product.getProductId(), product.getName(),
             product.getPrice(), product.getImageUrl(), product.getMdConfirmed());
@@ -69,28 +66,35 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto) {
-        findProductById(productId);
-
         Boolean mdConfirmed =
             productUpdateRequestDto.name().contains("카카오") ? productUpdateRequestDto.mdConfirmed()
                 : false;
-
-        if (productUpdateRequestDto.name().contains("카카오")
-            && !mdConfirmed) {
-            throw new UnapprovedProductException("협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
-        }
 
         Product product = new Product(productId, productUpdateRequestDto.name(),
             productUpdateRequestDto.price(), productUpdateRequestDto.imageUrl(),
             mdConfirmed);
 
-        productRepository.updateProduct(product);
+        product.validate();
+
+        update(productId, product);
     }
 
     @Override
     public void deleteProduct(Long productId) {
-        findProductById(productId);
+        products.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
-        productRepository.deleteProduct(productId);
+        products.deleteById(productId);
+    }
+
+    @Transactional
+    public void update(Long id, Product product) {
+        Product foundProduct = products.findById(id)
+            .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
+
+        foundProduct.rename(product.getName());
+        foundProduct.updatePrice(product.getPrice());
+        foundProduct.updateImageUrl(product.getImageUrl());
+        foundProduct.updateMdConfirmed(product.getMdConfirmed());
     }
 }
