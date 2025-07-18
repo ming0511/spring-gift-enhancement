@@ -3,6 +3,8 @@ package gift.member.controller;
 import gift.member.dto.AdminMemberCreateRequestDto;
 import gift.member.dto.AdminMemberGetResponseDto;
 import gift.member.dto.AdminMemberUpdateRequestDto;
+import gift.member.dto.MemberCreateCommand;
+import gift.member.dto.MemberUpdateCommand;
 import gift.member.service.MemberService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -34,7 +36,7 @@ public class AdminMemberController {
 
     @PostMapping("/create")
     public String createMember(
-        @Valid @ModelAttribute AdminMemberCreateRequestDto adminMemberCreateRequestDto,
+        @Valid @ModelAttribute AdminMemberCreateRequestDto requestDto,
         BindingResult bindingResult, Model model
     ) {
 
@@ -43,8 +45,11 @@ public class AdminMemberController {
             return "member/create-member";
         }
 
+        MemberCreateCommand dto = new MemberCreateCommand(requestDto.email(), requestDto.password(),
+            requestDto.name(), requestDto.role());
+
         try {
-            memberService.saveMember(adminMemberCreateRequestDto);
+            memberService.saveMember(dto);
             return "redirect:/admin/members";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -90,18 +95,21 @@ public class AdminMemberController {
 
     @PostMapping("/update/{memberId}")
     public String updateMemberById(@PathVariable Long memberId,
-        @Valid @ModelAttribute AdminMemberUpdateRequestDto adminMemberUpdateRequestDto,
+        @Valid @ModelAttribute AdminMemberUpdateRequestDto requestDto,
         BindingResult bindingResult,
         Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("errors", bindingResult.getAllErrors());
-            model.addAttribute("memberUpdateRequestDto", adminMemberUpdateRequestDto);
+            model.addAttribute("memberUpdateRequestDto", requestDto);
             return "member/update-member";
         }
 
+        MemberUpdateCommand dto = new MemberUpdateCommand(requestDto.email(), requestDto.password(),
+            requestDto.name(), requestDto.role());
+
         try {
-            memberService.updateMember(memberId, adminMemberUpdateRequestDto);
+            memberService.updateMember(memberId, dto);
             return "redirect:/admin/members";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());

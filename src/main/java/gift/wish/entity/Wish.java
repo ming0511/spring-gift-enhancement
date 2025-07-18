@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wishes")
+@Table(name = "wish")
 public class Wish {
 
     @Id
@@ -32,11 +32,11 @@ public class Wish {
     private Product product;
 
     @Column(nullable = false)
-    private LocalDateTime createDate;
+    private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createDate = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     protected Wish() {
@@ -48,16 +48,16 @@ public class Wish {
         this.product = product;
     }
 
-    public Wish(Member member, Product product, LocalDateTime createDate) {
+    public Wish(Member member, Product product, LocalDateTime createdAt) {
         this.member = member;
         this.product = product;
-        this.createDate = createDate;
+        this.createdAt = createdAt;
     }
 
-    public Wish(Long wishId, Product product, LocalDateTime createDate) {
+    public Wish(Long wishId, Product product, LocalDateTime createdAt) {
         this.wishId = wishId;
         this.product = product;
-        this.createDate = createDate;
+        this.createdAt = createdAt;
     }
 
     public Wish(Long wishId, Member member, Product product) {
@@ -66,11 +66,11 @@ public class Wish {
         this.product = product;
     }
 
-    public Wish(Long wishId, Member member, Product product, LocalDateTime createDate) {
+    public Wish(Long wishId, Member member, Product product, LocalDateTime createdAt) {
         this.wishId = wishId;
         this.member = member;
         this.product = product;
-        this.createDate = createDate;
+        this.createdAt = createdAt;
     }
 
     public Long getWishId() {
@@ -85,8 +85,8 @@ public class Wish {
         return product;
     }
 
-    public LocalDateTime getCreateDate() {
-        return createDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public Long getMemberId() {

@@ -14,12 +14,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 public class MemberRepositoryTest {
 
     @Autowired
-    private MemberRepository members;
+    private MemberRepository memberRepository;
 
     @Test
     void saveMember() {
         Member expected = MemberBuilder.aMember().build();
-        Member actual = members.save(expected);
+        Member actual = memberRepository.save(expected);
         assertAll(
             () -> assertThat(actual.getMemberId()).isNotNull(),
             () -> assertThat(actual.getEmail()).isEqualTo(expected.getEmail()),
@@ -32,19 +32,19 @@ public class MemberRepositoryTest {
     @Test
     void findMemberByEmail() {
         String expected = "one@email.com";
-        members.save(MemberBuilder.aMember().withEmail(expected).build());
+        memberRepository.save(MemberBuilder.aMember().withEmail(expected).build());
 
-        String actual = members.findByEmail(expected).get().getEmail();
+        String actual = memberRepository.findByEmail(expected).get().getEmail();
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void findAllMembers() {
-        members.save(MemberBuilder.aMember().withEmail("one@email.com").build());
-        members.save(MemberBuilder.aMember().withEmail("two@email.com").build());
-        members.save(MemberBuilder.aMember().withEmail("three@email.com").build());
+        memberRepository.save(MemberBuilder.aMember().withEmail("one@email.com").build());
+        memberRepository.save(MemberBuilder.aMember().withEmail("two@email.com").build());
+        memberRepository.save(MemberBuilder.aMember().withEmail("three@email.com").build());
 
-        List<Member> memberList = members.findAll();
+        List<Member> memberList = memberRepository.findAll();
 
         assertThat(memberList).hasSize(3);
     }
@@ -52,9 +52,9 @@ public class MemberRepositoryTest {
     @Test
     void findMemberById() {
         Member expected = MemberBuilder.aMember().build();
-        Member savedMember = members.save(expected);
+        Member savedMember = memberRepository.save(expected);
 
-        Member actual = members.findById(savedMember.getMemberId()).get();
+        Member actual = memberRepository.findById(savedMember.getMemberId()).get();
         assertAll(
             () -> assertThat(actual.getMemberId()).isNotNull(),
             () -> assertThat(actual.getEmail()).isEqualTo(expected.getEmail()),
@@ -71,18 +71,18 @@ public class MemberRepositoryTest {
     @Test
     void deleteMember() {
         Member expected = MemberBuilder.aMember().build();
-        Member savedMember = members.save(expected);
+        Member savedMember = memberRepository.save(expected);
 
-        members.delete(savedMember);
+        memberRepository.delete(savedMember);
 
-        assertThat(members.findById(savedMember.getMemberId())).isEmpty();
+        assertThat(memberRepository.findById(savedMember.getMemberId())).isEmpty();
     }
 
     @Test
     void existsByEmail() {
         Member expected = MemberBuilder.aMember().build();
-        Member savedMember = members.save(expected);
+        Member savedMember = memberRepository.save(expected);
 
-        assertThat(members.existsByEmail(savedMember.getEmail())).isTrue();
+        assertThat(memberRepository.existsByEmail(savedMember.getEmail())).isTrue();
     }
 }

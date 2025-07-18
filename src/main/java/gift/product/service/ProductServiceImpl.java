@@ -1,63 +1,69 @@
 package gift.product.service;
 
 import gift.exception.product.ProductNotFoundException;
-import gift.product.dto.ProductCreateRequestDto;
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
-import gift.product.dto.ProductUpdateRequestDto;
+import gift.product.dto.ProductPageResponseDto;
+import gift.product.dto.ProductUpdateCommand;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository products;
+    private final ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductRepository products) {
-        this.products = products;
+    public ProductServiceImpl(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @Override
-    public ProductCreateResponseDto saveProduct(ProductCreateRequestDto productCreateRequestDto) {
+    public ProductCreateResponseDto saveProduct(ProductCreateCommand dto) {
 
-        Boolean mdConfirmed =
-            productCreateRequestDto.name().contains("카카오") ? productCreateRequestDto.mdConfirmed()
-                : false;
+        Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
-        Product product = new Product(productCreateRequestDto.name(),
-            productCreateRequestDto.price(), productCreateRequestDto.imageUrl(),
-            mdConfirmed);
+        Product product = new Product(dto.name(), dto.price(), dto.imageUrl(), mdConfirmed);
 
         product.validate();
 
-        Product savedProduct = products.save(product);
+        Product savedProduct = productRepository.save(product);
 
         return new ProductCreateResponseDto(savedProduct.getProductId(), savedProduct.getName(),
             savedProduct.getPrice(), savedProduct.getImageUrl(), savedProduct.getMdConfirmed());
     }
 
     @Override
-    public List<ProductGetResponseDto> findAllProducts() {
-        List<Product> productList = products.findAll();
+    public ProductPageResponseDto findAllProducts(Pageable pageable) {
 
-        return productList.stream()
+        Page<Product> Products = productRepository.findAll(pageable);
+
+        List<ProductGetResponseDto> content = Products.getContent().stream()
             .map(product -> new ProductGetResponseDto(
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
                 product.getImageUrl(),
-                product.getMdConfirmed()
-            ))
+                product.getMdConfirmed()))
             .collect(Collectors.toList());
+
+        return new ProductPageResponseDto(
+            content,
+            Products.getNumber(),
+            Products.getSize(),
+            Products.getTotalElements(),
+            Products.getTotalPages());
     }
 
     @Override
     public ProductGetResponseDto findProductById(Long productId) {
-        Product product = products.findById(productId)
+        Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         return new ProductGetResponseDto(product.getProductId(), product.getName(),
@@ -65,13 +71,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto) {
-        Boolean mdConfirmed =
-            productUpdateRequestDto.name().contains("카카오") ? productUpdateRequestDto.mdConfirmed()
-                : false;
+    public void updateProduct(Long productId, ProductUpdateCommand dto) {
+        Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
-        Product product = new Product(productId, productUpdateRequestDto.name(),
-            productUpdateRequestDto.price(), productUpdateRequestDto.imageUrl(),
+        Product product = new Product(productId, dto.name(), dto.price(), dto.imageUrl(),
             mdConfirmed);
 
         product.validate();
@@ -81,15 +84,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long productId) {
-        products.findById(productId)
+        productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
-        products.deleteById(productId);
+        productRepository.deleteById(productId);
     }
 
     @Transactional
     public void update(Long id, Product product) {
-        Product foundProduct = products.findById(id)
+        Product foundProduct = productRepository.findById(id)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         foundProduct.rename(product.getName());

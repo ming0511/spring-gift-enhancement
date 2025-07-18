@@ -1,5 +1,6 @@
 package gift.member.controller;
 
+import gift.member.dto.LoginCommand;
 import gift.member.dto.LoginRequestDto;
 import gift.member.dto.TokenResponseDto;
 import gift.member.service.LoginService;
@@ -23,8 +24,10 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(
-        @Valid @RequestBody LoginRequestDto loginRequestDto) {
+        @Valid @RequestBody LoginRequestDto requestDto) {
 
-        return new ResponseEntity<>(loginService.login(loginRequestDto), HttpStatus.OK);
+        LoginCommand dto = new LoginCommand(requestDto.email(), requestDto.password());
+
+        return new ResponseEntity<>(loginService.login(dto), HttpStatus.OK);
     }
 }

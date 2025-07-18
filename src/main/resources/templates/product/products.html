@@ -39,14 +39,12 @@
     </thead>
 
     <tbody>
-    <tr th:each="product : ${products}">
-        <td th:text="${product.productId}">1</td>
-        <td th:text="${product.name}">상품명</td>
-        <td th:text="${product.price}">9000</td>
-        <td th:text="${product.imageUrl}">
-            https://st.kakaocdn.net/product/gift/product/20231010111814_9a667f9eccc943648797925498bdd8a3.jpg
-        </td>
-        <td th:text="${product.mdConfirmed}">false</td>
+    <tr th:each="product : ${products.content}">
+        <td th:text="${product.productId}"></td>
+        <td th:text="${product.name}"></td>
+        <td th:text="${product.price}"></td>
+        <td th:text="${product.imageUrl}"></td>
+        <td th:text="${product.mdConfirmed}"></td>
         <td>
             <a th:href="@{/admin/products/update/{id}(id=${product.productId})}">수정</a>
             <form th:action="@{/admin/products/delete/{id}(id=${product.productId})}"
@@ -59,6 +57,15 @@
     </tbody>
 </table>
 </p>
+
+<!-- 페이지네이션 -->
+<div th:if="${products.totalPages > 0}" class="pagination"
+     th:each="pageNumber : ${pageNumbers}">
+    <a th:href="@{/admin/products(page=${pageNumber - 1}, size=${products.size},
+				sort=${products.sort})}"
+       th:text="${pageNumber}"
+       th:class="${pageNumber==products.number + 1} ? 'active' : ''"></a>
+</div>
 
 </body>
 </html>

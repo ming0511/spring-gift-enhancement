@@ -10,9 +10,9 @@ import gift.member.security.JwtTokenProvider;
 import gift.product.builder.ProductBuilder;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductPageResponseDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,10 +41,10 @@ class ProductControllerTest {
     private final RestClient client = RestClient.builder().build();
 
     @Autowired
-    private ProductRepository products;
+    private ProductRepository productRepository;
 
     @Autowired
-    private MemberRepository members;
+    private MemberRepository memberRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -84,39 +84,39 @@ class ProductControllerTest {
     @BeforeAll
     void beforeAll() {
 
-        members.deleteAll();
+        memberRepository.deleteAll();
 
-        members.save(
+        memberRepository.save(
             MemberBuilder.aMember().withEmail("user@email.com").withPassword("1234")
-                .withName("user").withRole(Role.ROLE_USER).build());
+                .withName("user").withRole(Role.USER).build());
 
-        members.save(
+        memberRepository.save(
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
-                .withName("admin").withRole(Role.ROLE_ADMIN).build());
+                .withName("admin").withRole(Role.ADMIN).build());
 
-        members.findAll();
+        memberRepository.findAll();
 
-        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.ROLE_USER);
-        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ROLE_ADMIN);
+        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.USER);
+        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ADMIN);
     }
 
     @BeforeEach
     void setUp() {
-        products.deleteAll();
+        productRepository.deleteAll();
 
-        products.save(
+        productRepository.save(
             ProductBuilder.aProduct().withName("one").withPrice(1.0).withImageUrl("https://1.img")
                 .withMdConfirmed(false).build());
 
-        products.save(
+        productRepository.save(
             ProductBuilder.aProduct().withName("two").withPrice(2.0).withImageUrl("https://2.img")
                 .withMdConfirmed(false).build());
 
-        products.save(
+        productRepository.save(
             ProductBuilder.aProduct().withName("three").withPrice(3.0).withImageUrl("https://3.img")
                 .withMdConfirmed(false).build());
 
-        products.findAll();
+        productRepository.findAll();
     }
 
     // POST
@@ -213,7 +213,7 @@ class ProductControllerTest {
     void 전체상품조회_OK_테스트(String token) {
         // given & when
         var response = exchange(HttpMethod.GET, baseUrl(), token, null,
-            new ParameterizedTypeReference<List<ProductGetResponseDto>>() {
+            new ParameterizedTypeReference<ProductPageResponseDto>() {
             });
 
         // then
@@ -226,7 +226,7 @@ class ProductControllerTest {
     @Test
     void 단건상품조회_OK_테스트() {
         // given
-        Product savedProduct = products.save(
+        Product savedProduct = productRepository.save(
             ProductBuilder.aProduct()
                 .withName("one")
                 .withPrice(1.0)
@@ -275,7 +275,7 @@ class ProductControllerTest {
     @MethodSource("tokenProvider")
     void 단건상품수정_NO_CONTENT_테스트(String token) {
         // given
-        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Product savedProduct = productRepository.save(ProductBuilder.aProduct().build());
         Long productId = savedProduct.getProductId();
 
         var request = ProductBuilder.aProduct().build();
@@ -288,7 +288,7 @@ class ProductControllerTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        Product product = products.findById(productId).get();
+        Product product = productRepository.findById(productId).get();
         assertThat(product.getName()).isEqualTo(request.getName());
         assertThat(product.getPrice()).isEqualTo(request.getPrice());
         assertThat(product.getImageUrl()).isEqualTo(request.getImageUrl());
@@ -308,7 +308,7 @@ class ProductControllerTest {
     void 단건상품수정_NO_CONTENT_상품이름_유효성_검사(String validName) {
         // given
 
-        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Product savedProduct = productRepository.save(ProductBuilder.aProduct().build());
         Long productId = savedProduct.getProductId();
 
         Boolean mdConfirmed = false;
@@ -341,7 +341,7 @@ class ProductControllerTest {
     })
     void 단건상품수정_BAD_REQUEST_상품이름_유효성_검사(String invalidName) {
         //given
-        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Product savedProduct = productRepository.save(ProductBuilder.aProduct().build());
         Long productId = savedProduct.getProductId();
 
         var request = ProductBuilder.aProduct()
@@ -360,7 +360,7 @@ class ProductControllerTest {
     @Test
     void 단건상품수정_UNAUTHORIZED_인증없음() {
         //given
-        Product savedProduct = products.save(ProductBuilder.aProduct().build());
+        Product savedProduct = productRepository.save(ProductBuilder.aProduct().build());
         Long productId = savedProduct.getProductId();
 
         var request = ProductBuilder.aProduct().build();
@@ -379,7 +379,7 @@ class ProductControllerTest {
     @MethodSource("tokenProvider")
     void 단건상품삭제_NO_CONTENT_테스트(String token) {
         // given
-        Product savedProduct = products.save(
+        Product savedProduct = productRepository.save(
             ProductBuilder.aProduct()
                 .withName("one")
                 .withPrice(1.0)

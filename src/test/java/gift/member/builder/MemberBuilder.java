@@ -8,7 +8,7 @@ public class MemberBuilder {
     private String email = "default@email.com";
     private String password = "default";
     private String name = "user";
-    private Role role = Role.ROLE_USER;
+    private Role role = Role.USER;
 
     private MemberBuilder() {
 

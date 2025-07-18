@@ -1,11 +1,17 @@
 package gift.product.controller;
 
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductPageResponseDto;
+import gift.product.dto.ProductUpdateCommand;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,7 +40,7 @@ public class AdminProductController {
 
     @PostMapping("/create")
     public String createProduct(
-        @Valid @ModelAttribute ProductCreateRequestDto productCreateRequestDto,
+        @Valid @ModelAttribute ProductCreateRequestDto requestDto,
         BindingResult bindingResult, Model model
     ) {
 
@@ -43,8 +49,11 @@ public class AdminProductController {
             return "product/create-product";
         }
 
+        ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
         try {
-            productService.saveProduct(productCreateRequestDto);
+            productService.saveProduct(dto);
             return "redirect:/admin/products";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -53,9 +62,11 @@ public class AdminProductController {
     }
 
     @GetMapping
-    public String getProductsPage(Model model) {
+    public String getProductsPage(
+        @PageableDefault(page = 0, size = 10, sort = "productId", direction = Sort.Direction.DESC) Pageable pageable,
+        Model model) {
 
-        List<ProductGetResponseDto> products = productService.findAllProducts();
+        ProductPageResponseDto products = productService.findAllProducts(pageable);
         model.addAttribute("products", products);
         return "product/products";
     }
@@ -89,19 +100,22 @@ public class AdminProductController {
     @PostMapping("/update/{productId}")
     public String updateProductById(
         @PathVariable Long productId,
-        @Valid @ModelAttribute ProductUpdateRequestDto productUpdateRequestDto,
+        @Valid @ModelAttribute ProductUpdateRequestDto requestDto,
         BindingResult bindingResult, RedirectAttributes redirectAttributes
     ) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("productUpdateRequestDto",
-                productUpdateRequestDto);
+                requestDto);
             return "redirect:/admin/products/update/" + productId;
         }
 
+        ProductUpdateCommand dto = new ProductUpdateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
         try {
-            productService.updateProduct(productId, productUpdateRequestDto);
+            productService.updateProduct(productId, dto);
             return "redirect:/admin/products";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

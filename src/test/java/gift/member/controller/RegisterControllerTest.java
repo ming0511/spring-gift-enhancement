@@ -27,7 +27,7 @@ class RegisterControllerTest {
     private final RestClient client = RestClient.builder().build();
 
     @Autowired
-    private MemberRepository members;
+    private MemberRepository memberRepository;
 
     private String baseUrl() {
         return "http://localhost:" + port + "/api/members";
@@ -55,16 +55,16 @@ class RegisterControllerTest {
     @BeforeEach
     void setUp() {
 
-        members.deleteAll();
+        memberRepository.deleteAll();
 
-        members.save(
+        memberRepository.save(
             MemberBuilder.aMember().withEmail("one@email.com").withPassword("1234").build());
-        members.save(
+        memberRepository.save(
             MemberBuilder.aMember().withEmail("two@email.com").withPassword("1234").build());
-        members.save(
+        memberRepository.save(
             MemberBuilder.aMember().withEmail("three@email.com").withPassword("1234").build());
 
-        members.findAll();
+        memberRepository.findAll();
     }
 
     @Test

@@ -1,20 +1,21 @@
 package gift.product.service;
 
-import gift.product.dto.ProductCreateRequestDto;
+import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
-import gift.product.dto.ProductUpdateRequestDto;
-import java.util.List;
+import gift.product.dto.ProductPageResponseDto;
+import gift.product.dto.ProductUpdateCommand;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
 
-    ProductCreateResponseDto saveProduct(ProductCreateRequestDto productCreateRequestDto);
+    ProductCreateResponseDto saveProduct(ProductCreateCommand dto);
 
-    List<ProductGetResponseDto> findAllProducts();
+    ProductPageResponseDto findAllProducts(Pageable pageable);
 
     ProductGetResponseDto findProductById(Long productId);
 
-    void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto);
+    void updateProduct(Long productId, ProductUpdateCommand dto);
 
     void deleteProduct(Long productId);
 }

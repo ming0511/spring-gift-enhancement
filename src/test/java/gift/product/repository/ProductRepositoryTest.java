@@ -14,12 +14,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 public class ProductRepositoryTest {
 
     @Autowired
-    private ProductRepository products;
+    private ProductRepository productRepository;
 
     @Test
     void saveProduct() {
         Product expected = ProductBuilder.aProduct().build();
-        Product actual = products.save(expected);
+        Product actual = productRepository.save(expected);
 
         assertAll(
             () -> assertThat(actual.getProductId()).isNotNull(),
@@ -32,11 +32,11 @@ public class ProductRepositoryTest {
 
     @Test
     void findAllProducts() {
-        products.save(ProductBuilder.aProduct().withName("one").build());
-        products.save(ProductBuilder.aProduct().withName("two").build());
-        products.save(ProductBuilder.aProduct().withName("three").build());
+        productRepository.save(ProductBuilder.aProduct().withName("one").build());
+        productRepository.save(ProductBuilder.aProduct().withName("two").build());
+        productRepository.save(ProductBuilder.aProduct().withName("three").build());
 
-        List<Product> productList = products.findAll();
+        List<Product> productList = productRepository.findAll();
 
         assertThat(productList).hasSize(3);
     }
@@ -44,9 +44,9 @@ public class ProductRepositoryTest {
     @Test
     void findProductById() {
         Product expected = ProductBuilder.aProduct().build();
-        Product savedProduct = products.save(expected);
+        Product savedProduct = productRepository.save(expected);
 
-        Product actual = products.findById(savedProduct.getProductId()).get();
+        Product actual = productRepository.findById(savedProduct.getProductId()).get();
         assertAll(
             () -> assertThat(actual.getProductId()).isNotNull(),
             () -> assertThat(actual.getName()).isEqualTo(expected.getName()),
@@ -64,10 +64,10 @@ public class ProductRepositoryTest {
     @Test
     void deleteProduct() {
         Product expected = ProductBuilder.aProduct().build();
-        Product savedProduct = products.save(expected);
+        Product savedProduct = productRepository.save(expected);
 
-        products.delete(savedProduct);
+        productRepository.delete(savedProduct);
 
-        assertThat(products.findById(savedProduct.getProductId())).isEmpty();
+        assertThat(productRepository.findById(savedProduct.getProductId())).isEmpty();
     }
 }
