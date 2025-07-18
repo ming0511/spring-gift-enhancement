@@ -1,8 +1,8 @@
 package gift.member.service;
 
 import gift.member.dto.AdminMemberGetResponseDto;
-import gift.member.dto.AdminMemberUpdateRequestDto;
 import gift.member.dto.MemberCreateCommand;
+import gift.member.dto.MemberUpdateCommand;
 import gift.member.dto.RegisterCommand;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
@@ -20,7 +20,7 @@ public interface MemberService {
 
     AdminMemberGetResponseDto findMemberById(Long memberId);
 
-    void updateMember(Long memberId, AdminMemberUpdateRequestDto adminMemberUpdateRequestDto);
+    void updateMember(Long memberId, MemberUpdateCommand dto);
 
     void deleteMember(Long memberId);
 }

@@ -3,8 +3,8 @@ package gift.member.service;
 import gift.exception.member.EmailAlreadyExistsException;
 import gift.exception.member.MemberNotFoundException;
 import gift.member.dto.AdminMemberGetResponseDto;
-import gift.member.dto.AdminMemberUpdateRequestDto;
 import gift.member.dto.MemberCreateCommand;
+import gift.member.dto.MemberUpdateCommand;
 import gift.member.dto.RegisterCommand;
 import gift.member.dto.RegisterRequestDto;
 import gift.member.dto.TokenResponseDto;
@@ -87,12 +87,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateMember(Long memberId,
-        AdminMemberUpdateRequestDto adminMemberUpdateRequestDto) {
+    public void updateMember(Long memberId, MemberUpdateCommand dto) {
 
-        Member member = new Member(memberId,
-            adminMemberUpdateRequestDto.email(), adminMemberUpdateRequestDto.password(),
-            adminMemberUpdateRequestDto.name(), adminMemberUpdateRequestDto.role());
+        Member member = new Member(memberId, dto.email(), dto.password(), dto.name(), dto.role());
 
         update(memberId, member);
     }
