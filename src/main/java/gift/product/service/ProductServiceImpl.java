@@ -4,7 +4,7 @@ import gift.exception.product.ProductNotFoundException;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
-import gift.product.dto.ProductUpdateRequestDto;
+import gift.product.dto.ProductUpdateCommand;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -24,9 +24,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductCreateResponseDto saveProduct(ProductCreateCommand dto) {
 
-        Boolean mdConfirmed =
-            dto.name().contains("카카오") ? dto.mdConfirmed()
-                : false;
+        Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
         Product product = new Product(dto.name(), dto.price(), dto.imageUrl(), mdConfirmed);
 
@@ -63,13 +61,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto) {
-        Boolean mdConfirmed =
-            productUpdateRequestDto.name().contains("카카오") ? productUpdateRequestDto.mdConfirmed()
-                : false;
+    public void updateProduct(Long productId, ProductUpdateCommand dto) {
+        Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
-        Product product = new Product(productId, productUpdateRequestDto.name(),
-            productUpdateRequestDto.price(), productUpdateRequestDto.imageUrl(),
+        Product product = new Product(productId, dto.name(), dto.price(), dto.imageUrl(),
             mdConfirmed);
 
         product.validate();

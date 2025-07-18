@@ -3,7 +3,7 @@ package gift.product.service;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
-import gift.product.dto.ProductUpdateRequestDto;
+import gift.product.dto.ProductUpdateCommand;
 import java.util.List;
 
 public interface ProductService {
@@ -14,7 +14,7 @@ public interface ProductService {
 
     ProductGetResponseDto findProductById(Long productId);
 
-    void updateProduct(Long productId, ProductUpdateRequestDto productUpdateRequestDto);
+    void updateProduct(Long productId, ProductUpdateCommand dto);
 
     void deleteProduct(Long productId);
 }

@@ -4,6 +4,7 @@ import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductUpdateCommand;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -54,9 +55,13 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     public ResponseEntity<Void> updateProductById(@PathVariable Long productId,
-        @Valid @RequestBody ProductUpdateRequestDto productUpdateRequestDto) {
+        @Valid @RequestBody ProductUpdateRequestDto requestDto) {
 
-        productService.updateProduct(productId, productUpdateRequestDto);
+        ProductUpdateCommand dto = new ProductUpdateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
+        productService.updateProduct(productId, dto);
+        
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -3,6 +3,7 @@ package gift.product.controller;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductUpdateCommand;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -93,19 +94,22 @@ public class AdminProductController {
     @PostMapping("/update/{productId}")
     public String updateProductById(
         @PathVariable Long productId,
-        @Valid @ModelAttribute ProductUpdateRequestDto productUpdateRequestDto,
+        @Valid @ModelAttribute ProductUpdateRequestDto requestDto,
         BindingResult bindingResult, RedirectAttributes redirectAttributes
     ) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("productUpdateRequestDto",
-                productUpdateRequestDto);
+                requestDto);
             return "redirect:/admin/products/update/" + productId;
         }
 
+        ProductUpdateCommand dto = new ProductUpdateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed());
+
         try {
-            productService.updateProduct(productId, productUpdateRequestDto);
+            productService.updateProduct(productId, dto);
             return "redirect:/admin/products";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
