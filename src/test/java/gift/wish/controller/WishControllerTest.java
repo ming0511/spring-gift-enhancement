@@ -181,8 +181,14 @@ class WishControllerTest {
     @MethodSource("tokenProvider")
         // TODO: 이후 수량 변경에 활용할 수 있어서 따로 예외 처리 안함.
     void 위시상품추가_500_테스트(String token) {
+        Product product = productRepository.save(ProductBuilder.aProduct().build());
+        var response = exchange(HttpMethod.POST, baseUrl(), token,
+            new WishCreateRequestDto(product.getProductId()),
+            new ParameterizedTypeReference<WishCreateResponseDto>() {
+            });
+
         // given
-        var request = new WishCreateRequestDto(1L);
+        var request = new WishCreateRequestDto(product.getProductId());
 
         // when & then
         assertThatExceptionOfType(HttpServerErrorException.InternalServerError.class)

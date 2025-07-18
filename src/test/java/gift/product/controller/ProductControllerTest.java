@@ -10,9 +10,9 @@ import gift.member.security.JwtTokenProvider;
 import gift.product.builder.ProductBuilder;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductPageResponseDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -213,7 +213,7 @@ class ProductControllerTest {
     void 전체상품조회_OK_테스트(String token) {
         // given & when
         var response = exchange(HttpMethod.GET, baseUrl(), token, null,
-            new ParameterizedTypeReference<List<ProductGetResponseDto>>() {
+            new ParameterizedTypeReference<ProductPageResponseDto>() {
             });
 
         // then
