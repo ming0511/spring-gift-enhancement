@@ -85,10 +85,6 @@ public class Product {
     }
 
     public void validate() {
-        validateNameAndMdConfirmed(name, mdConfirmed);
-    }
-
-    private void validateNameAndMdConfirmed(String name, Boolean mdConfirmed) {
         boolean containsKakao = name != null && name.contains("카카오");
         boolean confirmed = mdConfirmed != null && mdConfirmed;
 
