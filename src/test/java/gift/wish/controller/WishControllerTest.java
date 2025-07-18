@@ -13,6 +13,7 @@ import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import gift.wish.dto.WishCreateRequestDto;
 import gift.wish.dto.WishCreateResponseDto;
+import gift.wish.dto.WishPageResponseDto;
 import gift.wish.entity.Wish;
 import gift.wish.repository.WishRepository;
 import java.util.stream.Stream;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -99,8 +101,10 @@ class WishControllerTest {
             MemberBuilder.aMember().withEmail("admin@email.com").withPassword("1234")
                 .withName("admin").withRole(Role.ADMIN).build());
 
-        userToken = jwtTokenProvider.generateToken(1L, "user@email.com", Role.USER);
-        adminToken = jwtTokenProvider.generateToken(2L, "admin@email.com", Role.ADMIN);
+        userToken = jwtTokenProvider.generateToken(member1.getMemberId(), "user@email.com",
+            Role.USER);
+        adminToken = jwtTokenProvider.generateToken(member2.getMemberId(), "admin@email.com",
+            Role.ADMIN);
 
         // product
         products.deleteAll();
@@ -188,74 +192,74 @@ class WishControllerTest {
                     })
             );
     }
-//
-//    // GET
-//    @ParameterizedTest
-//    @MethodSource("tokenProvider")
-//    void 위시상품조회_OK_성공(String token) {
-//        // given & when
-//        var response = exchange(HttpMethod.GET, baseUrl() + "?page=0&size=10&sort=createdDate,desc",
-//            token, null, new ParameterizedTypeReference<WishPageResponseDto>() {
-//            });
-//
-//        // then
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        var actual = response.getBody();
-//        System.out.println(actual);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {
-//        "",
-//        "?page=0",
-//        "?size=10",
-//        "?sort=createdDate,desc",
-//        "?sort=createdDate",
-//        "?sort=createdDate,asc",
-//        "?page=10&size=5&sort=createdDate,asc"
-//    })
-//    void 위시상품조회_OK_유효성검사성공(String validUrl) {
-//        // given & when
-//        var response = exchange(HttpMethod.GET, baseUrl() + validUrl,
-//            userToken, null, new ParameterizedTypeReference<WishPageResponseDto>() {
-//            });
-//
-//        // then
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        var actual = response.getBody();
-//        System.out.println(actual);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {
-//        "?size=0",
-//        "?sort=wishId,desc",
-//        "?sort=wishId",
-//        "?sort=wishId,asc"
-//    })
-//    void 위시상품조회_BAD_REQUEST_유효성검사실패(String validUrl) {
-//        // given & when & then
-//        assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
-//            .isThrownBy(
-//                () -> exchange(HttpMethod.GET, baseUrl() + validUrl,
-//                    userToken, null, new ParameterizedTypeReference<WishPageResponseDto>() {
-//                    })
-//            );
-//    }
-//
-//    @Test
-//    void 위시상품조회_UNAUTHORIZED_토큰없음() {
-//        // given & when & then
-//        assertThatExceptionOfType(HttpClientErrorException.Unauthorized.class)
-//            .isThrownBy(
-//                () -> exchange(HttpMethod.GET, baseUrl() + "?page=0&size=10&createdDate,desc", null,
-//                    null,
-//                    new ParameterizedTypeReference<WishPageResponseDto>() {
-//                    })
-//            );
-//    }
+
+    @ParameterizedTest
+    @MethodSource("tokenProvider")
+    void 위시상품조회_OK_성공(String token) {
+        // given & when
+
+        var response = exchange(HttpMethod.GET, baseUrl() + "?page=0&size=10&sort=createdAt,desc",
+            token, null, new ParameterizedTypeReference<WishPageResponseDto>() {
+            });
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        var actual = response.getBody();
+        System.out.println(actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "?page=0",
+        "?size=10",
+        "?sort=createdAt,desc",
+        "?sort=createdAt",
+        "?sort=createdAt,asc",
+        "?page=10&size=5&sort=createdAt,asc",
+        "?sort=wishId,desc",
+        "?sort=wishId",
+        "?sort=wishId,asc",
+        "?sort=createdAt,asc&sort=wishId,asc",
+        "?page=-1",
+        "?size=0"
+    })
+    void 위시상품조회_OK_유효성검사성공(String validUrl) {
+        // given & when
+        var response = exchange(HttpMethod.GET, baseUrl() + validUrl,
+            userToken, null, new ParameterizedTypeReference<WishPageResponseDto>() {
+            });
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        var actual = response.getBody();
+        System.out.println(actual);
+    }
+
+    @Test
+    void 위시상품조회_BAD_REQUEST_유효성검사실패() {
+        // given & when & then
+        assertThatExceptionOfType(HttpClientErrorException.BadRequest.class)
+            .isThrownBy(
+                () -> exchange(HttpMethod.GET, baseUrl() + "?sort=productId",
+                    userToken, null, new ParameterizedTypeReference<WishPageResponseDto>() {
+                    })
+            );
+    }
+
+    @Test
+    void 위시상품조회_UNAUTHORIZED_토큰없음() {
+        // given & when & then
+        assertThatExceptionOfType(HttpClientErrorException.Unauthorized.class)
+            .isThrownBy(
+                () -> exchange(HttpMethod.GET, baseUrl() + "?page=0&size=10&createdAt,desc", null,
+                    null,
+                    new ParameterizedTypeReference<WishPageResponseDto>() {
+                    })
+            );
+    }
 
     // DELETE
     @Test

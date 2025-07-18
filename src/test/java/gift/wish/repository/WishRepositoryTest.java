@@ -14,6 +14,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @DataJpaTest
 public class WishRepositoryTest {
@@ -104,7 +108,7 @@ public class WishRepositoryTest {
     }
 
     @Test
-    void countByMemberId() {
+    void findByMember_MemberId() {
         Member member = members.save(MemberBuilder.aMember().build());
         Product product = products.save(ProductBuilder.aProduct().withName("3").build());
         Wish expected = new Wish(member, product);
@@ -119,8 +123,23 @@ public class WishRepositoryTest {
         Wish expected2 = new Wish(member2, product2);
         wishes.save(expected2);
 
-        Long actual = wishes.countByMember_MemberId(member.getMemberId());
+        Sort sort = Sort.by("createDate").descending();
 
-        assertThat(actual).isEqualTo(2L);
+        Pageable pageable = PageRequest.of(0, 10, sort);
+
+        Page<Wish> actual = wishes.findByMember_MemberId(1L, pageable);
+
+        System.out.println("총 페이지 수: " + actual.getTotalPages());
+        System.out.println("총 요소 수: " + actual.getTotalElements());
+        System.out.println("현재 페이지 번호: " + actual.getNumber());
+        System.out.println("현재 페이지 데이터:");
+        for (Wish wish : actual.getContent()) {
+            System.out.println("ID: " + wish.getWishId());
+            System.out.println("memberId: " + wish.getMemberId());
+            System.out.println("productId: " + wish.getProductId());
+            System.out.println("productName: " + wish.getProduct().getName());
+            System.out.println("생성일: " + wish.getCreatedAt());
+            System.out.println("---------------");
+        }
     }
 }

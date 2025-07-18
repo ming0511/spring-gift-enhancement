@@ -4,10 +4,12 @@ import gift.wish.annotation.LoginMember;
 import gift.wish.dto.WishCreateCommand;
 import gift.wish.dto.WishCreateRequestDto;
 import gift.wish.dto.WishCreateResponseDto;
-import gift.wish.dto.WishGetRequestDto;
 import gift.wish.dto.WishPageResponseDto;
 import gift.wish.service.WishService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,17 +39,12 @@ public class WishController {
         return new ResponseEntity<>(wishService.addWish(memberId, dto), HttpStatus.CREATED);
     }
 
-    // /api/wishes?page=0&size=10&sort=createdDate,desc
+    // /api/wishes?page=0&size=10&sort=createdAt,desc
     @GetMapping
     public ResponseEntity<WishPageResponseDto> getWishes(@LoginMember Long memberId,
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "10") Integer size,
-        @RequestParam(defaultValue = "createdDate,desc") String sort) {
+        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        WishGetRequestDto wishGetRequestDto = new WishGetRequestDto(page, size, sort);
-
-        return new ResponseEntity<>(wishService.getWishes(memberId, wishGetRequestDto),
-            HttpStatus.OK);
+        return new ResponseEntity<>(wishService.getWishes(memberId, pageable), HttpStatus.OK);
     }
 
     @DeleteMapping("/{wishId}")

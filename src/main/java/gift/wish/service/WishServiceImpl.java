@@ -1,6 +1,5 @@
 package gift.wish.service;
 
-import gift.delete.repository.WishRepositoryInterface;
 import gift.exception.member.MemberNotFoundException;
 import gift.exception.product.ProductNotFoundException;
 import gift.exception.wish.InvalidPageException;
@@ -12,28 +11,27 @@ import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import gift.wish.dto.WishCreateCommand;
 import gift.wish.dto.WishCreateResponseDto;
-import gift.wish.dto.WishGetRequestDto;
 import gift.wish.dto.WishGetResponseDto;
 import gift.wish.dto.WishPageResponseDto;
-import gift.wish.entity.Page;
 import gift.wish.entity.Wish;
 import gift.wish.repository.WishRepository;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WishServiceImpl implements WishService {
 
-    private final WishRepositoryInterface wishRepository;
-
     private final WishRepository wishes;
     private final MemberRepository members;
     private final ProductRepository products;
 
-    public WishServiceImpl(WishRepositoryInterface wishRepository, WishRepository wishes,
+    public WishServiceImpl(WishRepository wishes,
         MemberRepository members, ProductRepository products) {
-        this.wishRepository = wishRepository;
         this.wishes = wishes;
         this.members = members;
         this.products = products;
@@ -61,51 +59,35 @@ public class WishServiceImpl implements WishService {
 
         return new WishCreateResponseDto(savedWish.getWishId(), savedWish.getMemberId(),
             savedWish.getProductId(),
-            savedWish.getCreateDate());
+            savedWish.getCreatedAt());
     }
 
-    // TODO: JPA 정렬 방법?
     @Override
-    public WishPageResponseDto getWishes(Long memberId, WishGetRequestDto wishGetRequestDto) {
-        Integer page = wishGetRequestDto.page();
-        Integer size = wishGetRequestDto.size();
-        String sort = wishGetRequestDto.sort();
+    public WishPageResponseDto getWishes(Long memberId, Pageable pageable) {
 
-        if (size <= 0) {
-            throw new InvalidPageException("허용되지 않은 페이지 크기입니다.");
+        Set<String> allowedFields = Set.of("createdAt", "wishId");
+        for (Sort.Order order : pageable.getSort()) {
+            if (!allowedFields.contains(order.getProperty())) {
+                throw new InvalidPageException("허용되지 않은 정렬 필드입니다: " + order.getProperty());
+            }
         }
 
-        String[] sortParts = sort.split(",");
-        String sortField = sortParts[0];
-        String sortOrder = (sortParts.length > 1) ? sortParts[1] : "ASC";
-        sortOrder = sortOrder.toUpperCase();
+        Page<Wish> wishPage = wishes.findByMember_MemberId(memberId, pageable);
 
-        if (!sortField.equals("createdDate")) {
-            throw new InvalidPageException("허용되지 않은 정렬 필드입니다.");
-        }
-        if (!sortOrder.equals("ASC") && !sortOrder.equals("DESC")) {
-            throw new InvalidPageException("허용되지 않은 정렬 방향입니다.");
-        }
-
-        Integer offset = page * size;
-
-        Page pageInfo = new Page(size, offset, sortField, sortOrder);
-
-        List<Wish> wishList = wishRepository.getWishes(memberId, pageInfo);
-
-        Long total = wishes.countByMember_MemberId(memberId);
-
-        List<WishGetResponseDto> content = wishList.stream()
+        List<WishGetResponseDto> content = wishPage.getContent().stream()
             .map(wish -> new WishGetResponseDto(
                 wish.getWishId(),
                 wish.getProductId(),
-                wish.getCreateDate()
-            ))
+                (wish.getProduct() != null) ? wish.getProduct().getName() : "알 수 없음",
+                wish.getCreatedAt()))
             .collect(Collectors.toList());
 
-        Integer totalPages = (int) Math.ceil((double) total / size);
-
-        return new WishPageResponseDto(content, page, size, total, totalPages);
+        return new WishPageResponseDto(
+            content,
+            wishPage.getNumber(),
+            wishPage.getSize(),
+            wishPage.getTotalElements(),
+            wishPage.getTotalPages());
     }
 
     @Override
