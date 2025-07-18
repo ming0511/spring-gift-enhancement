@@ -4,12 +4,15 @@ import gift.exception.product.ProductNotFoundException;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductPageResponseDto;
 import gift.product.dto.ProductUpdateCommand;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,18 +40,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductGetResponseDto> findAllProducts() {
-        List<Product> productList = products.findAll();
+    public ProductPageResponseDto findAllProducts(Pageable pageable) {
 
-        return productList.stream()
+        Page<Product> ProductPage = products.findAll(pageable);
+
+        List<ProductGetResponseDto> content = ProductPage.getContent().stream()
             .map(product -> new ProductGetResponseDto(
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
                 product.getImageUrl(),
-                product.getMdConfirmed()
-            ))
+                product.getMdConfirmed()))
             .collect(Collectors.toList());
+
+        return new ProductPageResponseDto(
+            content,
+            ProductPage.getNumber(),
+            ProductPage.getSize(),
+            ProductPage.getTotalElements(),
+            ProductPage.getTotalPages());
     }
 
     @Override

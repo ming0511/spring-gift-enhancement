@@ -4,11 +4,14 @@ import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
+import gift.product.dto.ProductPageResponseDto;
 import gift.product.dto.ProductUpdateCommand;
 import gift.product.dto.ProductUpdateRequestDto;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,9 +45,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductGetResponseDto> getProducts() {
+    public ProductPageResponseDto getProducts(
+        @PageableDefault(page = 0, size = 10, sort = "productId", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        return productService.findAllProducts();
+        return productService.findAllProducts(pageable);
     }
 
     @GetMapping("/{productId}")
@@ -61,7 +65,7 @@ public class ProductController {
             requestDto.imageUrl(), requestDto.mdConfirmed());
 
         productService.updateProduct(productId, dto);
-        
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
