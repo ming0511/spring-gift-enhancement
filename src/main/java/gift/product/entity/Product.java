@@ -35,23 +35,24 @@ public class Product {
     private Boolean mdConfirmed;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Option> options = new HashSet<>();
+    private Set<Option> options;
 
     protected Product() {
 
     }
 
     public Product(String name, Double price, String imageUrl, Boolean mdConfirmed) {
-        this(null, name, price, imageUrl, mdConfirmed);
+        this(null, name, price, imageUrl, mdConfirmed, null);
     }
 
     public Product(Long productId, String name, Double price, String imageUrl,
-        Boolean mdConfirmed) {
+        Boolean mdConfirmed, Set<Option> options) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
         this.mdConfirmed = mdConfirmed;
+        this.options = (options != null) ? options : new HashSet<>();
     }
 
     public Long getProductId() {
