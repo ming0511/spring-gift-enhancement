@@ -81,4 +81,14 @@ public class Option {
     public void changeProduct(Product product) {
         this.product = product;
     }
+
+    public void subtractQuantity(Integer amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("차감량은 0보다 커야 합니다.");
+        }
+        if (quantity < amount) {
+            throw new IllegalArgumentException("옵션 수량이 부족합니다.");
+        }
+        this.quantity -= amount;
+    }
 }

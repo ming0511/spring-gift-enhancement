@@ -94,4 +94,12 @@ public class OptionServiceImpl implements OptionService {
 
         product.removeOption(option);
     }
+
+    @Override
+    public void subtractOptionQuantity(Long optionId, Integer amount) {
+        Option option = optionRepository.findById(optionId)
+            .orElseThrow(() -> new OptionNotFoundException("옵션을 찾을 수 없습니다."));
+
+        option.subtractQuantity(amount);
+    }
 }
