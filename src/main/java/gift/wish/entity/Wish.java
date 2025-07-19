@@ -44,26 +44,7 @@ public class Wish {
     }
 
     public Wish(Member member, Product product) {
-        this.member = member;
-        this.product = product;
-    }
-
-    public Wish(Member member, Product product, LocalDateTime createdAt) {
-        this.member = member;
-        this.product = product;
-        this.createdAt = createdAt;
-    }
-
-    public Wish(Long wishId, Product product, LocalDateTime createdAt) {
-        this.wishId = wishId;
-        this.product = product;
-        this.createdAt = createdAt;
-    }
-
-    public Wish(Long wishId, Member member, Product product) {
-        this.wishId = wishId;
-        this.member = member;
-        this.product = product;
+        this(null, member, product, null);
     }
 
     public Wish(Long wishId, Member member, Product product, LocalDateTime createdAt) {

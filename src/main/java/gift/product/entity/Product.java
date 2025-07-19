@@ -33,10 +33,7 @@ public class Product {
     }
 
     public Product(String name, Double price, String imageUrl, Boolean mdConfirmed) {
-        this.name = name;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.mdConfirmed = mdConfirmed;
+        this(null, name, price, imageUrl, mdConfirmed);
     }
 
     public Product(Long productId, String name, Double price, String imageUrl,

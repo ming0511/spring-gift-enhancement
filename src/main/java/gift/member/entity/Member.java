@@ -36,10 +36,7 @@ public class Member {
     }
 
     public Member(String email, String password, String name, Role role) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.role = role;
+        this(null, email, password, name, role);
     }
 
     public Member(Long memberId, String email, String password, String name, Role role) {
