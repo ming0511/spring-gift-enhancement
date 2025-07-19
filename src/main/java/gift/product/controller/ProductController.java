@@ -41,7 +41,9 @@ public class ProductController {
         ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
             requestDto.imageUrl(), requestDto.mdConfirmed());
 
-        return new ResponseEntity<>(productService.saveProduct(dto), HttpStatus.CREATED);
+        ProductCreateResponseDto responseDto = productService.saveProduct(dto);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -54,7 +56,9 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<ProductGetResponseDto> getProductById(@PathVariable Long productId) {
 
-        return new ResponseEntity<>(productService.findProductById(productId), HttpStatus.OK);
+        ProductGetResponseDto responseDto = productService.findProductById(productId);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PutMapping("/{productId}")
