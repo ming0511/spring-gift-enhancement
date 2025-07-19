@@ -29,7 +29,8 @@ public class RegisterController {
         RegisterCommand dto = new RegisterCommand(requestDto.email(), requestDto.password(),
             requestDto.name(), requestDto.role());
 
-        return new ResponseEntity<>(memberService.registerMember(dto), HttpStatus.CREATED);
+        TokenResponseDto responseDto = memberService.registerMember(dto);
 
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 }

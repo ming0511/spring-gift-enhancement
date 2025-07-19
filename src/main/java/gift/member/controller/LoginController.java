@@ -28,6 +28,8 @@ public class LoginController {
 
         LoginCommand dto = new LoginCommand(requestDto.email(), requestDto.password());
 
-        return new ResponseEntity<>(loginService.login(dto), HttpStatus.OK);
+        TokenResponseDto responseDto = loginService.login(dto);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
