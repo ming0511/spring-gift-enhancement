@@ -9,4 +9,6 @@ public interface OptionService {
     Option addProductOption(Long productId, OptionCreateCommand dto);
 
     void updateProductOption(Long productId, OptionUpdateCommand dto);
+
+    void deleteProductOption(Long productId, Long optionId);
 }

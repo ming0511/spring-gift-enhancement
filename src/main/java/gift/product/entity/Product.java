@@ -103,4 +103,9 @@ public class Product {
                 "협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
         }
     }
+
+    public void removeOption(Option option) {
+        options.remove(option);
+        option.changeProduct(null); // 관계 끊기
+    }
 }

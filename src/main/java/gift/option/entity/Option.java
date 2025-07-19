@@ -71,4 +71,8 @@ public class Option {
     public void changeQuantity(Integer quantity) {
         this.quantity = quantity;
     }
+
+    public void changeProduct(Product product) {
+        this.product = product;
+    }
 }

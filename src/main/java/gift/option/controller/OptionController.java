@@ -10,6 +10,7 @@ import gift.option.service.OptionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,6 +55,16 @@ public class OptionController {
             requestDto.quantity());
 
         optionService.updateProductOption(productId, dto);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{productId}/options/{optionId}")
+    public ResponseEntity<Void> deleteProductOption(
+        @PathVariable Long productId,
+        @PathVariable Long optionId) {
+
+        optionService.deleteProductOption(productId, optionId);
 
         return ResponseEntity.noContent().build();
     }
