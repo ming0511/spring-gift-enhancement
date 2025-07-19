@@ -3,14 +3,19 @@ package gift.option.controller;
 import gift.option.dto.OptionCreateCommand;
 import gift.option.dto.OptionCreateRequestDto;
 import gift.option.dto.OptionCreateResponseDto;
+import gift.option.dto.OptionGetResponseDto;
 import gift.option.dto.OptionUpdateCommand;
 import gift.option.dto.OptionUpdateRequestDto;
 import gift.option.entity.Option;
 import gift.option.service.OptionService;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,6 +48,22 @@ public class OptionController {
         );
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{productId}/options")
+    public ResponseEntity<List<OptionGetResponseDto>> getProductOptions(
+        @PathVariable Long productId
+    ) {
+        Set<Option> options = optionService.getProductOptions(productId);
+
+        List<OptionGetResponseDto> responseDto = options.stream()
+            .map(option -> new OptionGetResponseDto(
+                option.getOptionId(),
+                option.getName(),
+                option.getQuantity()))
+            .collect(Collectors.toList());
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PutMapping("/{productId}/options/{optionId}")

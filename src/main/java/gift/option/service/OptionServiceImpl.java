@@ -9,6 +9,7 @@ import gift.option.entity.Option;
 import gift.option.repository.OptionRepository;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,14 @@ public class OptionServiceImpl implements OptionService {
         product.addOption(option);
 
         return optionRepository.save(option);
+    }
+
+    @Override
+    public Set<Option> getProductOptions(Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
+
+        return product.getOptions();
     }
 
     @Override
