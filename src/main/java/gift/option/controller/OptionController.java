@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +36,7 @@ public class OptionController {
     @PostMapping("/{productId}/options")
     public ResponseEntity<OptionCreateResponseDto> addProductOption(
         @PathVariable Long productId,
-        @Valid OptionCreateRequestDto requestDto) {
+        @Valid @RequestBody OptionCreateRequestDto requestDto) {
 
         OptionCreateCommand dto = new OptionCreateCommand(requestDto.name(), requestDto.quantity());
 
@@ -70,7 +71,7 @@ public class OptionController {
     public ResponseEntity<Void> updateProductOption(
         @PathVariable Long productId,
         @PathVariable Long optionId,
-        @Valid OptionUpdateRequestDto requestDto) {
+        @Valid @RequestBody OptionUpdateRequestDto requestDto) {
 
         OptionUpdateCommand dto = new OptionUpdateCommand(optionId, requestDto.name(),
             requestDto.quantity());
