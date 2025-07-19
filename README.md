@@ -62,3 +62,100 @@
 
 - [x] 상품 리스트(페이지네이션 구현)
 - [x] 위시 리스트(페이지네이션 구현)
+
+### 🚀 3단계 - 상품 옵션
+
+상품 정보에 옵션을 추가한다. 상품과 옵션 모델 간의 관계를 고려하여 설계하고 구현한다.
+
+- [ ] 상품에는 항상 하나 이상의 옵션이 있어야 한다.(1:N)
+    - [ ] 옵션 이름은 공백을 포함하여 최대 50자까지 입력할 수 있다.
+    - [ ] 특수 문자
+        - 가능: ( ), [ ], +, -, &, /, _
+        - 그 외 특수 문자 사용 불가
+    - [ ] 옵션 수량은 최소 1개 이상 1억 개 미만이다.(quantity의 기본값은 1로)
+- [ ] 중복된 옵션은 구매 시 고객에게 불편을 줄 수 있다. 동일한 상품 내의 옵션 이름은 중복될 수 없다.
+- [ ] 상품 옵션의 수량을 지정된 숫자만큼 빼는 기능을 구현한다.
+    - 별도의 HTTP API를 만들 필요는 없다.
+    - 서비스 클래스 또는 엔티티 클래스에서 기능을 구현하고 나중에 사용할 수 있도록 한다.
+- (선택) 관리자 화면에서 옵션을 추가할 수 있다.
+
+- 상품 옵션 API
+
+| URL	                                          | 메서드	    | 기능	          | 설명                     |
+|-----------------------------------------------|---------|--------------|------------------------|
+| /api/products/{productId}/options	            | POST	   | 상품 옵션 추가	    | 상품에 옵션을 추가한다.          |
+| /api/products/{productId}/options/{optionId}	 | PUT     | 	상품 옵션 수정	   | 기존 상품 옵션의 정보를 수정한다.    |
+| /api/products/{productId}/options/{optionId}	 | DELETE	 | 상품 옵션 삭제	    | 기존 제품 옵션을 삭제한다.        |
+| /api/products/{productId}/options	            | GET	    | 상품 옵션 목록 조회	 | 특정 상품에 대한 모든 옵션을 조회한다. |
+
+#### 🛠 구현할 기능 목록
+
+- [ ] 상품 옵션 추가
+    - [ ] **Request**: POST /api/products/{productId}/options
+        ```json
+        [
+            {
+                "name": "01. [Best] 시어버터 핸드 & 시어 스틱 립 밤",
+                "quantity": 969
+            }
+        ]
+        ```
+
+    - [ ] **Response**
+        ```http
+        HTTP/1.1 201
+        Content-Type: application/json
+        ```
+        ```json
+        [
+          {
+            "optionId": 464946561,
+            "name": "01. [Best] 시어버터 핸드 & 시어 스틱 립 밤",
+            "quantity": 969
+          }
+        ]
+        ```
+
+- [ ] 상품 옵션 수정
+    - [ ] **Request**: PUT /api/products/{productId}/options/{optionId}
+        ```json
+        [
+            {
+                "name": "01. [Best] 시어버터 핸드 & 시어 스틱 립 밤",
+                "quantity": 969
+            }
+        ]
+        ```
+
+    - [ ] **Response**
+        ```http
+        HTTP/1.1 204
+        Content-Type: application/json
+        ```
+
+- [ ] 상품 옵션 삭제
+    - [ ] **Request**: DELETE /api/products/{productId}/options/{optionId}
+
+    - [ ] **Response**
+        ```http
+        HTTP/1.1 204
+        Content-Type: application/json
+        ```
+
+- [ ] 상품 옵션 추가
+    - [ ] **Request**: GET /api/products/1/options
+
+    - [ ] **Response**
+        ```http
+        HTTP/1.1 200
+        Content-Type: application/json
+        ```
+        ```json
+        [
+            {
+                "optionId": 464946561,
+                "name": "01. [Best] 시어버터 핸드 & 시어 스틱 립 밤",
+                "quantity": 969
+            }
+        ]
+        ```
