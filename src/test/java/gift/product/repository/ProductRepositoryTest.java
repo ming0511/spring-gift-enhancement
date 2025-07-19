@@ -3,6 +3,7 @@ package gift.product.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import gift.option.entity.Option;
 import gift.product.builder.ProductBuilder;
 import gift.product.entity.Product;
 import java.util.List;
@@ -57,11 +58,6 @@ public class ProductRepositoryTest {
     }
 
     @Test
-    void updateProduct() {
-
-    }
-
-    @Test
     void deleteProduct() {
         Product expected = ProductBuilder.aProduct().build();
         Product savedProduct = productRepository.save(expected);
@@ -69,5 +65,21 @@ public class ProductRepositoryTest {
         productRepository.delete(savedProduct);
 
         assertThat(productRepository.findById(savedProduct.getProductId())).isEmpty();
+    }
+
+    @Test
+    void 상품_옵션_추가() {
+        // given
+        Product product = ProductBuilder.aProduct().withName("product").build();
+
+        // when
+        Product savedProduct = productRepository.save(product);
+
+        // then
+        assertThat(savedProduct.getOptions()).hasSize(2);
+
+        for (Option option : savedProduct.getOptions()) {
+            assertThat(option.getProduct()).isEqualTo(savedProduct);
+        }
     }
 }

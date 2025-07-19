@@ -1,6 +1,9 @@
 package gift.product.builder;
 
+import gift.option.entity.Option;
 import gift.product.entity.Product;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProductBuilder {
 
@@ -8,6 +11,10 @@ public class ProductBuilder {
     private Double price = 4500.0;
     private String imageUrl = "http://default.img";
     private Boolean mdConfirmed = false;
+    private Set<Option> options = new HashSet<>(Set.of(
+        new Option("1호", 10),
+        new Option("2호", 5)
+    ));
 
     private ProductBuilder() {
 
@@ -37,8 +44,18 @@ public class ProductBuilder {
         return this;
     }
 
+    public ProductBuilder withOptions(Set<Option> options) {
+        this.options = options;
+        return this;
+    }
+
     public Product build() {
-        return new Product(name, price, imageUrl, mdConfirmed);
+
+        Product product = new Product(name, price, imageUrl, mdConfirmed);
+
+        product.addOptions(options);
+
+        return product;
     }
 
     public String getName() {
@@ -55,5 +72,9 @@ public class ProductBuilder {
 
     public Boolean getMdConfirmed() {
         return mdConfirmed;
+    }
+
+    public Set<Option> getOptions() {
+        return options;
     }
 }
