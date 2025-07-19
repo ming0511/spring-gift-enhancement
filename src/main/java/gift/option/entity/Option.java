@@ -63,4 +63,12 @@ public class Option {
     public Long getProductId() {
         return product.getProductId();
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

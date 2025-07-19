@@ -4,6 +4,7 @@ import gift.exception.member.EmailAlreadyExistsException;
 import gift.exception.member.LoginFailedException;
 import gift.exception.member.MemberNotFoundException;
 import gift.exception.option.DulicateOptionNameException;
+import gift.exception.option.OptionNotFoundException;
 import gift.exception.product.ProductNotFoundException;
 import gift.exception.product.UnapprovedProductException;
 import gift.exception.wish.InvalidAuthorizationException;
@@ -21,7 +22,7 @@ public class GlobalRestExceptionHandler {
 
     // 404 리소스 없음
     @ExceptionHandler({ProductNotFoundException.class, MemberNotFoundException.class,
-        WishNotFoundException.class})
+        WishNotFoundException.class, OptionNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(RuntimeException ex) {
         return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
