@@ -85,6 +85,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void updateMember(Long memberId, MemberUpdateCommand dto) {
 
         Member member = new Member(memberId, dto.email(), dto.password(), dto.name(), dto.role());
@@ -100,7 +101,6 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.deleteById(memberId);
     }
 
-    @Transactional
     public void update(Long id, Member member) {
         Member foundMember = memberRepository.findById(id)
             .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
