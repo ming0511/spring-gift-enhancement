@@ -74,6 +74,10 @@ public class Product {
         return mdConfirmed;
     }
 
+    public Set<Option> getOptions() {
+        return options;
+    }
+
     public void rename(String name) {
         this.name = name;
     }

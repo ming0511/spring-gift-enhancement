@@ -3,6 +3,7 @@ package gift.exception;
 import gift.exception.member.EmailAlreadyExistsException;
 import gift.exception.member.LoginFailedException;
 import gift.exception.member.MemberNotFoundException;
+import gift.exception.option.DulicateOptionNameException;
 import gift.exception.product.ProductNotFoundException;
 import gift.exception.product.UnapprovedProductException;
 import gift.exception.wish.InvalidAuthorizationException;
@@ -30,6 +31,12 @@ public class GlobalRestExceptionHandler {
     @ExceptionHandler({UnapprovedProductException.class, EmailAlreadyExistsException.class,
         InvalidPageException.class})
     public ResponseEntity<String> handleBadRequestException(RuntimeException ex) {
+        return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // 400 입력 값 검증 실패 - 옵션 이름 중복
+    @ExceptionHandler(DulicateOptionNameException.class)
+    public ResponseEntity<String> handleDuplicateOptionNameException(RuntimeException ex) {
         return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
