@@ -71,6 +71,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void updateProduct(Long productId, ProductUpdateCommand dto) {
         Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
@@ -90,7 +91,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productId);
     }
 
-    @Transactional
     public void update(Long id, Product product) {
         Product foundProduct = productRepository.findById(id)
             .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
