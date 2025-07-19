@@ -104,8 +104,13 @@ public class Product {
         }
     }
 
+    public void addOption(Option option) {
+        options.add(option);
+        option.changeProduct(this);
+    }
+
     public void removeOption(Option option) {
         options.remove(option);
-        option.changeProduct(null); // 관계 끊기
+        option.changeProduct(null);
     }
 }

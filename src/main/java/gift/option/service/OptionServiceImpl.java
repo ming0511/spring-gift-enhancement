@@ -25,6 +25,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Transactional
     public Option addProductOption(Long productId, OptionCreateCommand dto) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
@@ -37,6 +38,8 @@ public class OptionServiceImpl implements OptionService {
         }
 
         Option option = new Option(dto.name(), dto.quantity(), product);
+
+        product.addOption(option);
 
         return optionRepository.save(option);
     }
