@@ -1,5 +1,6 @@
 package gift.product.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gift.exception.product.UnapprovedProductException;
 import gift.option.entity.Option;
 import jakarta.persistence.CascadeType;
@@ -35,6 +36,7 @@ public class Product {
     private Boolean mdConfirmed;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     private Set<Option> options;
 
     protected Product() {
@@ -43,6 +45,11 @@ public class Product {
 
     public Product(String name, Double price, String imageUrl, Boolean mdConfirmed) {
         this(null, name, price, imageUrl, mdConfirmed, null);
+    }
+
+    public Product(Long productId, String name, Double price, String imageUrl,
+        Boolean mdConfirmed) {
+        this(productId, name, price, imageUrl, mdConfirmed, null);
     }
 
     public Product(Long productId, String name, Double price, String imageUrl,
@@ -102,6 +109,12 @@ public class Product {
         if (containsKakao && !confirmed) {
             throw new UnapprovedProductException(
                 "협의되지 않은 '카카오'가 포함된 상품명은 사용할 수 없습니다.");
+        }
+    }
+
+    public void addOptions(Set<Option> options) {
+        for (Option option : options) {
+            addOption(option);
         }
     }
 

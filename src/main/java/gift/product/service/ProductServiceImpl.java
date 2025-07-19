@@ -1,8 +1,8 @@
 package gift.product.service;
 
 import gift.exception.product.ProductNotFoundException;
+import gift.option.entity.Option;
 import gift.product.dto.ProductCreateCommand;
-import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductPageResponseDto;
 import gift.product.dto.ProductUpdateCommand;
@@ -10,6 +10,7 @@ import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductCreateResponseDto saveProduct(ProductCreateCommand dto) {
+    public Product saveProduct(ProductCreateCommand dto) {
 
         Boolean mdConfirmed = dto.name().contains("카카오") ? dto.mdConfirmed() : false;
 
@@ -33,10 +34,13 @@ public class ProductServiceImpl implements ProductService {
 
         product.validate();
 
-        Product savedProduct = productRepository.save(product);
+        Set<Option> options = dto.options().stream()
+            .map(option -> new Option(option.name(), option.quantity(), product))
+            .collect(Collectors.toSet());
 
-        return new ProductCreateResponseDto(savedProduct.getProductId(), savedProduct.getName(),
-            savedProduct.getPrice(), savedProduct.getImageUrl(), savedProduct.getMdConfirmed());
+        product.addOptions(options);
+
+        return productRepository.save(product);
     }
 
     @Override

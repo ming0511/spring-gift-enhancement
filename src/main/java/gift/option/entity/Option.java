@@ -1,5 +1,6 @@
 package gift.option.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import gift.product.entity.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,9 +29,14 @@ public class Option {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_option_product_id_ref_product_id"))
+    @JsonBackReference
     private Product product;
 
     protected Option() {
+    }
+
+    public Option(String name, Integer quantity) {
+        this(null, name, quantity, null);
     }
 
     public Option(String name, Integer quantity, Product product) {

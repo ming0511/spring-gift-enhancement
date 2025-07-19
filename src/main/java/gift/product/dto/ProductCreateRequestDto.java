@@ -1,9 +1,13 @@
 package gift.product.dto;
 
+import gift.option.dto.OptionCreateRequestDto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.Set;
 
 public record ProductCreateRequestDto(
     @NotNull(message = "Product Name must not be null.")
@@ -22,7 +26,10 @@ public record ProductCreateRequestDto(
     String imageUrl,
 
     @NotNull(message = "Product Md Confirmed must not be null.")
-    Boolean mdConfirmed
+    Boolean mdConfirmed,
+
+    @NotEmpty(message = "상품은 최소 하나 이상의 옵션을 가져야 합니다.")
+    Set<@Valid OptionCreateRequestDto> options
 ) {
 
 }

@@ -1,9 +1,15 @@
 package gift.product.dto;
 
-public record ProductCreateResponseDto(Long productId,
-                                       String name,
-                                       Double price,
-                                       String imageUrl,
-                                       Boolean mdConfirmed) {
+import gift.option.dto.OptionCreateResponseDto;
+import java.util.List;
+
+public record ProductCreateResponseDto(
+    Long productId,
+    String name,
+    Double price,
+    String imageUrl,
+    Boolean mdConfirmed,
+    List<OptionCreateResponseDto> options
+) {
 
 }

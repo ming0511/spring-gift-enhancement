@@ -1,5 +1,7 @@
 package gift.product.controller;
 
+import gift.option.dto.OptionCreateCommand;
+import gift.option.dto.OptionCreateResponseDto;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
@@ -7,8 +9,12 @@ import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductPageResponseDto;
 import gift.product.dto.ProductUpdateCommand;
 import gift.product.dto.ProductUpdateRequestDto;
+import gift.product.entity.Product;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -38,10 +44,24 @@ public class ProductController {
     public ResponseEntity<ProductCreateResponseDto> createProduct(
         @Valid @RequestBody ProductCreateRequestDto requestDto) {
 
-        ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
-            requestDto.imageUrl(), requestDto.mdConfirmed());
+        Set<OptionCreateCommand> options = requestDto.options().stream()
+            .map(optionDto -> new OptionCreateCommand(optionDto.name(), optionDto.quantity()))
+            .collect(Collectors.toSet());
 
-        ProductCreateResponseDto responseDto = productService.saveProduct(dto);
+        ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
+            requestDto.imageUrl(), requestDto.mdConfirmed(), options);
+
+        Product product = productService.saveProduct(dto);
+
+        List<OptionCreateResponseDto> optionResponseDtos = product.getOptions().stream()
+            .map(optionDto -> new OptionCreateResponseDto(optionDto.getOptionId(),
+                optionDto.getName(),
+                optionDto.getQuantity()))
+            .collect(Collectors.toList());
+
+        ProductCreateResponseDto responseDto = new ProductCreateResponseDto(product.getProductId(),
+            product.getName(), product.getPrice(), product.getImageUrl(), product.getMdConfirmed(),
+            optionResponseDtos);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
