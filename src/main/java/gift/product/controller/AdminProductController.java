@@ -63,7 +63,7 @@ public class AdminProductController {
 
     @GetMapping
     public String getProductsPage(
-        @PageableDefault(page = 0, size = 10, sort = "productId", direction = Sort.Direction.DESC) Pageable pageable,
+        @PageableDefault(sort = "productId", direction = Sort.Direction.DESC) Pageable pageable,
         Model model) {
 
         ProductPageResponseDto products = productService.findAllProducts(pageable);

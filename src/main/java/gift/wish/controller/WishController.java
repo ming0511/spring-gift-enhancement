@@ -42,7 +42,7 @@ public class WishController {
     // /api/wishes?page=0&size=10&sort=createdAt,desc
     @GetMapping
     public ResponseEntity<WishPageResponseDto> getWishes(@LoginMember Long memberId,
-        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return new ResponseEntity<>(wishService.getWishes(memberId, pageable), HttpStatus.OK);
     }
