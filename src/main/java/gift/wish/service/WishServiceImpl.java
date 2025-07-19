@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WishServiceImpl implements WishService {
 
+    private static final Set<String> ALLOWED_FIELDS = Set.of("createdAt", "wishId");
+
     private final WishRepository wishRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
@@ -66,9 +68,8 @@ public class WishServiceImpl implements WishService {
     @Override
     public WishPageResponseDto getWishes(Long memberId, Pageable pageable) {
 
-        Set<String> allowedFields = Set.of("createdAt", "wishId");
         for (Sort.Order order : pageable.getSort()) {
-            if (!allowedFields.contains(order.getProperty())) {
+            if (!ALLOWED_FIELDS.contains(order.getProperty())) {
                 throw new InvalidPageException("허용되지 않은 정렬 필드입니다: " + order.getProperty());
             }
         }
