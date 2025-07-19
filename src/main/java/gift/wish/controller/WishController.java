@@ -36,7 +36,9 @@ public class WishController {
 
         WishCreateCommand dto = new WishCreateCommand(requestDto.productId());
 
-        return new ResponseEntity<>(wishService.addWish(memberId, dto), HttpStatus.CREATED);
+        WishCreateResponseDto responseDto = wishService.addWish(memberId, dto);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     // /api/wishes?page=0&size=10&sort=createdAt,desc
@@ -44,12 +46,16 @@ public class WishController {
     public ResponseEntity<WishPageResponseDto> getWishes(@LoginMember Long memberId,
         @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        return new ResponseEntity<>(wishService.getWishes(memberId, pageable), HttpStatus.OK);
+        WishPageResponseDto responseDto = wishService.getWishes(memberId, pageable);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{wishId}")
     public ResponseEntity<Void> deleteWish(@LoginMember Long memberId, @PathVariable Long wishId) {
+
         wishService.deleteWish(memberId, wishId);
+
         return ResponseEntity.noContent().build();
     }
 }
