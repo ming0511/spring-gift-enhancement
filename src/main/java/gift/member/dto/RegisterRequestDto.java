@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record RegisterRequestDto(
-    @NotBlank(message = "Email must not be blank.")
+    @NotBlank(message = "이메일은 필수 입력 항목입니다.")
     String email,
 
-    @NotBlank(message = "Password must not be blank.")
+    @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
     String password,
 
-    @NotNull(message = "Member Name must not be null.")
+    @NotNull(message = "회원 이름은 필수 입력 항목입니다.")
     String name,
 
-    @NotNull(message = "Role must not be null.")
+    @NotNull(message = "권한은 필수 선택 항목입니다: USER, ADMIN")
     Role role
 ) {
 
