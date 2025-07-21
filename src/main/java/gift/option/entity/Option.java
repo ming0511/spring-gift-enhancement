@@ -70,7 +70,7 @@ public class Option {
         return product.getProductId();
     }
 
-    public void changeName(String name) {
+    public void rename(String name) {
         this.name = name;
     }
 

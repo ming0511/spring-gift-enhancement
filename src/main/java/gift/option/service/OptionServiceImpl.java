@@ -75,7 +75,7 @@ public class OptionServiceImpl implements OptionService {
             }
         }
 
-        option.changeName(dto.name());
+        option.rename(dto.name());
         option.changeQuantity(dto.quantity());
     }
 

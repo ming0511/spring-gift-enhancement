@@ -69,7 +69,7 @@ public class OptionRepositoryTest {
         Option savedOption = optionRepository.save(option);
 
         // when
-        savedOption.changeName("changed");
+        savedOption.rename("changed");
 
         Option updatedOption = optionRepository.save(savedOption);
 
