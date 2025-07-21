@@ -1,6 +1,6 @@
 package gift.option.service;
 
-import gift.exception.option.DulicateOptionNameException;
+import gift.exception.option.DuplicateOptionNameException;
 import gift.exception.option.OptionNotFoundException;
 import gift.exception.product.ProductMismatchException;
 import gift.exception.product.ProductNotFoundException;
@@ -32,12 +32,7 @@ public class OptionServiceImpl implements OptionService {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
 
-        Boolean optionExists = product.getOptions().stream()
-            .anyMatch(option -> option.getName().equals(dto.name()));
-
-        if (optionExists) {
-            throw new DulicateOptionNameException("동일한 이름의 옵션이 이미 존재합니다: " + dto.name());
-        }
+        checkDuplicateOptionName(productId, dto.name());
 
         Option option = new Option(dto.name(), dto.quantity(), product);
 
@@ -68,12 +63,7 @@ public class OptionServiceImpl implements OptionService {
         }
 
         if (!option.getName().equals(dto.name())) {
-            Boolean optionExists = product.getOptions().stream()
-                .anyMatch(option1 -> option1.getName().equals(dto.name()));
-
-            if (optionExists) {
-                throw new DulicateOptionNameException("동일한 이름의 옵션이 이미 존재합니다: " + dto.name());
-            }
+            checkDuplicateOptionName(productId, dto.name());
         }
 
         option.rename(dto.name());
@@ -102,5 +92,17 @@ public class OptionServiceImpl implements OptionService {
             .orElseThrow(() -> new OptionNotFoundException("옵션을 찾을 수 없습니다."));
 
         option.subtractQuantity(amount);
+    }
+
+    public void checkDuplicateOptionName(Long productId, String optionName) {
+        Product product = productRepository.findWithOptionsById(productId)
+            .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
+
+        boolean exists = product.getOptions().stream()
+            .anyMatch(option -> option.getName().equals(optionName));
+
+        if (exists) {
+            throw new DuplicateOptionNameException("동일한 이름의 옵션이 이미 존재합니다: " + optionName);
+        }
     }
 }
