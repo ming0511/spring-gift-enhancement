@@ -1,7 +1,9 @@
 package gift.option.dto;
 
+import gift.option.entity.OptionName;
+
 public record OptionCreateCommand(
-    String name,
+    OptionName name,
     Integer quantity
 ) {
 

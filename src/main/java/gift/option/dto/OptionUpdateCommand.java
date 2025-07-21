@@ -1,8 +1,10 @@
 package gift.option.dto;
 
+import gift.option.entity.OptionName;
+
 public record OptionUpdateCommand(
     Long optionId,
-    String name,
+    OptionName name,
     Integer quantity
 ) {
 
