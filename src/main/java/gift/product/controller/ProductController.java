@@ -2,6 +2,7 @@ package gift.product.controller;
 
 import gift.option.dto.OptionCreateCommand;
 import gift.option.dto.OptionCreateResponseDto;
+import gift.option.entity.OptionName;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
@@ -45,7 +46,10 @@ public class ProductController {
         @Valid @RequestBody ProductCreateRequestDto requestDto) {
 
         Set<OptionCreateCommand> options = requestDto.options().stream()
-            .map(optionDto -> new OptionCreateCommand(optionDto.name(), optionDto.quantity()))
+            .map(optionDto -> {
+                OptionName optionName = new OptionName(optionDto.name());
+                return new OptionCreateCommand(optionName, optionDto.quantity());
+            })
             .collect(Collectors.toSet());
 
         ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
@@ -55,7 +59,7 @@ public class ProductController {
 
         List<OptionCreateResponseDto> optionResponseDtos = product.getOptions().stream()
             .map(optionDto -> new OptionCreateResponseDto(optionDto.getOptionId(),
-                optionDto.getName(),
+                optionDto.getName().toString(),
                 optionDto.getQuantity()))
             .collect(Collectors.toList());
 

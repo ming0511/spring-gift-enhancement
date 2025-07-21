@@ -1,6 +1,7 @@
 package gift.product.controller;
 
 import gift.option.dto.OptionCreateCommand;
+import gift.option.entity.OptionName;
 import gift.product.dto.ProductCreateCommand;
 import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductGetResponseDto;
@@ -53,7 +54,10 @@ public class AdminProductController {
         }
 
         Set<OptionCreateCommand> options = requestDto.options().stream()
-            .map(optionDto -> new OptionCreateCommand(optionDto.name(), optionDto.quantity()))
+            .map(option -> {
+                OptionName optionName = new OptionName(option.name());
+                return new OptionCreateCommand(optionName, option.quantity());
+            })
             .collect(Collectors.toSet());
 
         ProductCreateCommand dto = new ProductCreateCommand(requestDto.name(), requestDto.price(),
