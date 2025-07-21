@@ -1,8 +1,10 @@
 package gift.option.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import gift.option.OptionNameConverter;
 import gift.product.entity.Product;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -22,7 +24,8 @@ public class Option {
     private Long optionId;
 
     @Column(length = 50, nullable = false)
-    private String name;
+    @Convert(converter = OptionNameConverter.class)
+    private OptionName name;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -35,15 +38,15 @@ public class Option {
     protected Option() {
     }
 
-    public Option(String name, Integer quantity) {
+    public Option(OptionName name, Integer quantity) {
         this(null, name, quantity, null);
     }
 
-    public Option(String name, Integer quantity, Product product) {
+    public Option(OptionName name, Integer quantity, Product product) {
         this(null, name, quantity, product);
     }
 
-    public Option(Long optionId, String name, Integer quantity, Product product) {
+    public Option(Long optionId, OptionName name, Integer quantity, Product product) {
         this.optionId = optionId;
         this.name = name;
         this.quantity = quantity;
@@ -54,7 +57,7 @@ public class Option {
         return optionId;
     }
 
-    public String getName() {
+    public OptionName getName() {
         return name;
     }
 
@@ -70,7 +73,7 @@ public class Option {
         return product.getProductId();
     }
 
-    public void rename(String name) {
+    public void rename(OptionName name) {
         this.name = name;
     }
 
