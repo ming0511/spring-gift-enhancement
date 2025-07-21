@@ -3,7 +3,7 @@ package gift.exception;
 import gift.exception.member.EmailAlreadyExistsException;
 import gift.exception.member.LoginFailedException;
 import gift.exception.member.MemberNotFoundException;
-import gift.exception.option.DulicateOptionNameException;
+import gift.exception.option.DuplicateOptionNameException;
 import gift.exception.option.OptionNotFoundException;
 import gift.exception.product.ProductMismatchException;
 import gift.exception.product.ProductNotFoundException;
@@ -37,7 +37,7 @@ public class GlobalRestExceptionHandler {
     }
 
     // 400 입력 값 검증 실패 - 옵션 이름 중복, 잘못된 옵션 ID
-    @ExceptionHandler({DulicateOptionNameException.class, ProductMismatchException.class})
+    @ExceptionHandler({DuplicateOptionNameException.class, ProductMismatchException.class})
     public ResponseEntity<String> handleDuplicateOptionNameException(RuntimeException ex) {
         return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
