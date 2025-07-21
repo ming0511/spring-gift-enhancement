@@ -5,6 +5,7 @@ import gift.exception.member.LoginFailedException;
 import gift.exception.member.MemberNotFoundException;
 import gift.exception.option.DulicateOptionNameException;
 import gift.exception.option.OptionNotFoundException;
+import gift.exception.product.ProductMismatchException;
 import gift.exception.product.ProductNotFoundException;
 import gift.exception.product.UnapprovedProductException;
 import gift.exception.wish.InvalidAuthorizationException;
@@ -35,8 +36,8 @@ public class GlobalRestExceptionHandler {
         return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    // 400 입력 값 검증 실패 - 옵션 이름 중복
-    @ExceptionHandler(DulicateOptionNameException.class)
+    // 400 입력 값 검증 실패 - 옵션 이름 중복, 잘못된 옵션 ID
+    @ExceptionHandler({DulicateOptionNameException.class, ProductMismatchException.class})
     public ResponseEntity<String> handleDuplicateOptionNameException(RuntimeException ex) {
         return new ResponseEntity<>("오류: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
