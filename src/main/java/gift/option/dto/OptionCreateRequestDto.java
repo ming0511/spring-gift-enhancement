@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.Length;
 
 public record OptionCreateRequestDto(
-    @NotNull(message = "Option Name must not be null.")
+    @NotNull(message = "옵션 이름은 필수 입력 항목입니다.")
     @Length(max = 50, message = "옵션 이름은 공백을 포함하여 최대 50자까지 입력할 수 있습니다.")
     @Pattern(
         regexp = "^[\\p{L}\\p{N} ()\\[\\]+\\-&/_]*$",
@@ -15,7 +15,7 @@ public record OptionCreateRequestDto(
     )
     String name,
 
-    @NotNull(message = "Option Quantity must not be null.")
+    @NotNull(message = "옵션 수량은 필수 입력 항목입니다.")
     @Min(value = 1, message = "옵션 수량은 최소 1개 이상이어야 합니다.")
     @Max(value = 100_000_000 - 1, message = "옵션 수량은 1억 미만이어야 합니다.")
     Integer quantity
