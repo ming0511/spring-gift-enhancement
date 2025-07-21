@@ -7,6 +7,7 @@ import gift.option.dto.OptionGetResponseDto;
 import gift.option.dto.OptionUpdateCommand;
 import gift.option.dto.OptionUpdateRequestDto;
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.option.service.OptionService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,13 +39,15 @@ public class OptionController {
         @PathVariable Long productId,
         @Valid @RequestBody OptionCreateRequestDto requestDto) {
 
-        OptionCreateCommand dto = new OptionCreateCommand(requestDto.name(), requestDto.quantity());
+        OptionName optionName = new OptionName(requestDto.name());
+
+        OptionCreateCommand dto = new OptionCreateCommand(optionName, requestDto.quantity());
 
         Option option = optionService.addProductOption(productId, dto);
 
         OptionCreateResponseDto responseDto = new OptionCreateResponseDto(
             option.getOptionId(),
-            option.getName(),
+            option.getName().toString(),
             option.getQuantity()
         );
 
@@ -60,7 +63,7 @@ public class OptionController {
         List<OptionGetResponseDto> responseDto = options.stream()
             .map(option -> new OptionGetResponseDto(
                 option.getOptionId(),
-                option.getName(),
+                option.getName().toString(),
                 option.getQuantity()))
             .collect(Collectors.toList());
 
@@ -73,7 +76,9 @@ public class OptionController {
         @PathVariable Long optionId,
         @Valid @RequestBody OptionUpdateRequestDto requestDto) {
 
-        OptionUpdateCommand dto = new OptionUpdateCommand(optionId, requestDto.name(),
+        OptionName optionName = new OptionName(requestDto.name());
+
+        OptionUpdateCommand dto = new OptionUpdateCommand(optionId, optionName,
             requestDto.quantity());
 
         optionService.updateProductOption(productId, dto);
