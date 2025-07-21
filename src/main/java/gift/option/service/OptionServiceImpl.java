@@ -7,6 +7,7 @@ import gift.exception.product.ProductNotFoundException;
 import gift.option.dto.OptionCreateCommand;
 import gift.option.dto.OptionUpdateCommand;
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.option.repository.OptionRepository;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
@@ -94,7 +95,7 @@ public class OptionServiceImpl implements OptionService {
         option.subtractQuantity(amount);
     }
 
-    public void checkDuplicateOptionName(Long productId, String optionName) {
+    public void checkDuplicateOptionName(Long productId, OptionName optionName) {
         Product product = productRepository.findWithOptionsById(productId)
             .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
 
