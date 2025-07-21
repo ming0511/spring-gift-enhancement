@@ -83,14 +83,14 @@ public class OptionServiceImpl implements OptionService {
     @Override
     @Transactional
     public void deleteProductOption(Long productId, Long optionId) {
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
 
         Option option = optionRepository.findById(optionId)
             .orElseThrow(() -> new OptionNotFoundException("해당 옵션을 찾을 수 없습니다."));
 
-        if (!option.getProductId().equals(product.getProductId())) {
-            throw new OptionNotFoundException("해당 옵션은 지정된 상품에 속해 있지 않습니다.");
+        Product product = option.getProduct();
+
+        if (!product.getProductId().equals(productId)) {
+            throw new ProductMismatchException("옵션에 저장된 상품과 전달받은 상품 ID가 일치하지 않습니다.");
         }
 
         product.removeOption(option);
