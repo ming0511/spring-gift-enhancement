@@ -1,6 +1,7 @@
 package gift.product.builder;
 
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.product.entity.Product;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,8 +13,8 @@ public class ProductBuilder {
     private String imageUrl = "http://default.img";
     private Boolean mdConfirmed = false;
     private Set<Option> options = new HashSet<>(Set.of(
-        new Option("1호", 10),
-        new Option("2호", 5)
+        new Option(new OptionName("default"), 5),
+        new Option(new OptionName("default2"), 10)
     ));
 
     private ProductBuilder() {

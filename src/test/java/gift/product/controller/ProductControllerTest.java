@@ -7,12 +7,16 @@ import gift.member.Role;
 import gift.member.builder.MemberBuilder;
 import gift.member.repository.MemberRepository;
 import gift.member.security.JwtTokenProvider;
+import gift.option.dto.OptionCreateRequestDto;
 import gift.product.builder.ProductBuilder;
+import gift.product.dto.ProductCreateRequestDto;
 import gift.product.dto.ProductCreateResponseDto;
 import gift.product.dto.ProductGetResponseDto;
 import gift.product.dto.ProductPageResponseDto;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -124,7 +128,10 @@ class ProductControllerTest {
     @MethodSource("tokenProvider")
     void 단건상품등록_CREATED_테스트(String token) {
         // given
-        var request = ProductBuilder.aProduct().build();
+        Set<OptionCreateRequestDto> options = new HashSet<>(Set.of(
+            new OptionCreateRequestDto("test", 1), new OptionCreateRequestDto("test2", 2)));
+
+        var request = new ProductCreateRequestDto("default", 1234.0, "email.com", false, options);
 
         // when
         var response = exchange(HttpMethod.POST, baseUrl(), token, request,
@@ -150,16 +157,10 @@ class ProductControllerTest {
     })
     void 단건상품등록_CREATED_상품이름_유효성_검사(String validName) {
         // given
-        Boolean mdConfirmed = false;
+        Set<OptionCreateRequestDto> options = new HashSet<>(Set.of(
+            new OptionCreateRequestDto("test", 1), new OptionCreateRequestDto("test2", 2)));
 
-        if (validName.equals("카카오")) {
-            mdConfirmed = true;
-        }
-
-        var request = ProductBuilder.aProduct()
-            .withName(validName)
-            .withMdConfirmed(mdConfirmed)
-            .build();
+        var request = new ProductCreateRequestDto(validName, 1234.0, "email.com", true, options);
 
         // when
         var response = exchange(HttpMethod.POST, baseUrl(), userToken, request,

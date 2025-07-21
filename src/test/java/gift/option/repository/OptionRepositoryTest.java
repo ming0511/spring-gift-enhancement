@@ -3,6 +3,7 @@ package gift.option.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.product.builder.ProductBuilder;
 import gift.product.entity.Product;
 import java.util.Set;
@@ -21,7 +22,9 @@ public class OptionRepositoryTest {
         // given
         Product product = ProductBuilder.aProduct().withName("product").build();
 
-        Option option = new Option("test", 10, product);
+        OptionName test = new OptionName("test");
+
+        Option option = new Option(test, 10, product);
 
         product.addOption(option);
         // when
@@ -29,7 +32,7 @@ public class OptionRepositoryTest {
 
         // then
         assertThat(savedOption.getOptionId()).isNotNull();
-        assertThat(savedOption.getName()).isEqualTo("test");
+        assertThat(savedOption.getName()).isEqualTo(test);
         assertThat(savedOption.getQuantity()).isEqualTo(10);
         assertThat(savedOption.getProduct()).isEqualTo(product);
 
@@ -41,7 +44,9 @@ public class OptionRepositoryTest {
         // given
         Product product = ProductBuilder.aProduct().withName("product").build();
 
-        Option option = new Option("test", 10, product);
+        OptionName test = new OptionName("test");
+
+        Option option = new Option(test, 10, product);
 
         product.addOption(option);
 
@@ -62,14 +67,18 @@ public class OptionRepositoryTest {
         // given
         Product product = ProductBuilder.aProduct().withName("product").build();
 
-        Option option = new Option("test", 10, product);
+        OptionName test = new OptionName("test");
+
+        Option option = new Option(test, 10, product);
 
         product.addOption(option);
 
         Option savedOption = optionRepository.save(option);
 
+        OptionName changedTest = new OptionName("changedTest");
+
         // when
-        savedOption.rename("changed");
+        savedOption.rename(changedTest);
 
         Option updatedOption = optionRepository.save(savedOption);
 
@@ -87,7 +96,9 @@ public class OptionRepositoryTest {
         // given
         Product product = ProductBuilder.aProduct().withName("product").build();
 
-        Option option = new Option("test", 10, product);
+        OptionName test = new OptionName("test");
+
+        Option option = new Option(test, 10, product);
 
         product.addOption(option);
 
@@ -112,7 +123,9 @@ public class OptionRepositoryTest {
         // given
         Product product = ProductBuilder.aProduct().withName("product").build();
 
-        Option option = new Option("test", 10, product);
+        OptionName test = new OptionName("test");
+
+        Option option = new Option(test, 10, product);
 
         product.addOption(option);
 

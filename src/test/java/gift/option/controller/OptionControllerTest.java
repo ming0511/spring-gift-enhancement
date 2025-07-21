@@ -12,6 +12,7 @@ import gift.option.dto.OptionCreateResponseDto;
 import gift.option.dto.OptionGetResponseDto;
 import gift.option.dto.OptionUpdateRequestDto;
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.option.repository.OptionRepository;
 import gift.product.builder.ProductBuilder;
 import gift.product.entity.Product;
@@ -174,9 +175,12 @@ class OptionControllerTest {
     @Test
     void 상품옵션추가_BAD_REQUEST_동일옵션() {
         // given
+        OptionName one = new OptionName("test");
+        OptionName two = new OptionName("test2");
+
         Set<Option> options = new HashSet<>(Set.of(
-            new Option("test", 10),
-            new Option("test2", 20)
+            new Option(one, 10),
+            new Option(two, 20)
         ));
 
         Product product = ProductBuilder.aProduct().withName("product1").withOptions(options)
